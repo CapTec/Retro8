@@ -5,12 +5,12 @@ module.exports = function(grunt) {
       unit: {
         configFile: 'karma.conf.js',
         background: true,
-        browsers: ['PhantomJS2']
+        browsers: ['PhantomJS']
       },
       travis: {
         configFile: 'karma.conf.js',
         singleRun: true,
-        browsers: ['PhantomJS2']
+        browsers: ['PhantomJS']
       }
     },
     watch: {
