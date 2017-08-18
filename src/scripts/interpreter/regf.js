@@ -47,7 +47,7 @@ define(function() {
       if (self.keyboard[prop] !== 1)
         continue;
       pressed = true;
-      key = prop;
+      key = parseInt(prop, 10);
       break;
     }
 
@@ -55,7 +55,6 @@ define(function() {
       return;
 
     var vx = (opcode & 0x0F00) >> 8;
-    key = typeof key === 'string' ? parseInt(key, 10) : key;
     self.registers[vx] = key;
     self.program_counter += 2;
   }

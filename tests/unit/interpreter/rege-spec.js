@@ -28,6 +28,22 @@ define(function(require) {
 
         expect(state.program_counter).toBe(expected_pc);
       });
+
+      it('increments program_counter by 2 if vx is not pressed', function() {
+        var state = {
+          registers: Interpreter.prototype.initRegisters(),
+          program_counter: 0,
+          keyboard: {
+            0xA: 0
+          } // A key pressed
+        };
+        state.registers[0] = 0XA;
+        var expected_pc = 2;
+
+        actual.call(undefined, opcode, state);
+
+        expect(state.program_counter).toBe(expected_pc);
+      });
     });
 
     describe('getOps(0xEXA1)', function() {
@@ -50,6 +66,22 @@ define(function(require) {
         };
         state.registers[0] = 0xA;
         var expected_pc = 4;
+
+        actual.call(undefined, opcode, state);
+
+        expect(state.program_counter).toBe(expected_pc);
+      });
+
+      it('increments program_counter by 2 if vx is pressed', function() {
+        var state = {
+          registers: Interpreter.prototype.initRegisters(),
+          program_counter: 0,
+          keyboard: {
+            0xA: 1
+          } // A key not pressed
+        };
+        state.registers[0] = 0xA;
+        var expected_pc = 2;
 
         actual.call(undefined, opcode, state);
 

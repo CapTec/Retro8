@@ -146,10 +146,10 @@ define(function() {
     var vx = (opcode & 0x0F00) >> 8,
       vy = (opcode & 0x00F0) >> 4;
 
-    if (self.registers[vx] > self.registers[vy]) {
-      self.registers[0xF] = 0;
-    } else {
+    if (self.registers[vy] > self.registers[vx]) {
       self.registers[0xF] = 1;
+    } else {
+      self.registers[0xF] = 0;
     }
 
     self.registers[vx] = self.registers[vy] - self.registers[vx];

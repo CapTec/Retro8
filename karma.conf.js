@@ -16,15 +16,23 @@ module.exports = function(config) {
     // list of files / patterns to load in the browser
     files: [
       'tests/test-main.js',
-      {pattern: 'src/scripts/interpreter/**/*.js', included: false},
-      {pattern: 'src/scripts/interpreter/*.js', included: false},
-      {pattern: 'tests/unit/**/*.js', included: false}
+      {
+        pattern: 'src/scripts/interpreter/**/*.js',
+        included: false
+      },
+      {
+        pattern: 'src/scripts/interpreter/*.js',
+        included: false
+      },
+      {
+        pattern: 'tests/unit/**/*.js',
+        included: false
+      }
     ],
 
 
     // list of files to exclude
-    exclude: [
-    ],
+    exclude: [],
 
 
     // preprocess matching files before serving them to the browser
@@ -75,5 +83,5 @@ module.exports = function(config) {
     // Concurrency level
     // how many browser should be started simultaneous
     concurrency: Infinity
-  })
-}
+  });
+};

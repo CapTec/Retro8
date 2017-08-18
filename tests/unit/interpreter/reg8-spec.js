@@ -225,7 +225,7 @@ define(function(require) {
         expect(actual.prototype.constructor.name).toBe(expected);
       });
 
-      it('should set Vx to Vx - Vy', function() {
+      it('should set Vx to Vx - Vy and set Vf to 1 for no borrow', function() {
         var state = {
           registers: Interpreter.prototype.initRegisters(),
           program_counter: 0
@@ -235,10 +235,30 @@ define(function(require) {
 
         var expected_vx = 0x6;
         var expected_pc = 2;
+        var expected_vf = 0x1;
 
         actual.call(undefined, opcode, state);
         expect(state.registers[0]).toBe(expected_vx);
         expect(state.program_counter).toBe(expected_pc);
+        expect(state.registers[0xF]).toBe(expected_vf);
+      });
+
+      it('should set Vx to Vx - Vy and set Vf to 0 for borrow', function() {
+        var state = {
+          registers: Interpreter.prototype.initRegisters(),
+          program_counter: 0
+        };
+        state.registers[0] = 0x8;
+        state.registers[1] = 0xA;
+
+        var expected_vx = 0xFE;
+        var expected_pc = 2;
+        var expected_vf = 0x0;
+
+        actual.call(undefined, opcode, state);
+        expect(state.registers[0]).toBe(expected_vx);
+        expect(state.program_counter).toBe(expected_pc);
+        expect(state.registers[0xF]).toBe(expected_vf);
       });
     });
 
@@ -280,7 +300,7 @@ define(function(require) {
         expect(actual.prototype.constructor.name).toBe(expected);
       });
 
-      it('should set Vx to Vy - Vx and increment program counter by 2', function() {
+      it('should set Vx to Vy - Vx. program_counter += 2 vf = 1', function() {
         var state = {
           registers: Interpreter.prototype.initRegisters(),
           program_counter: 0
@@ -289,10 +309,29 @@ define(function(require) {
         state.registers[1] = 0xFF;
         var expected_vx = 0xFE;
         var expected_pc = 2;
+        var expected_vf = 1;
 
         actual.call(undefined, opcode, state);
         expect(state.registers[0]).toBe(expected_vx);
         expect(state.program_counter).toBe(expected_pc);
+        expect(state.registers[0xF]).toBe(expected_vf);
+      });
+
+      it('should set Vx to Vy - Vx. program_counter += 2 vf = 1', function() {
+        var state = {
+          registers: Interpreter.prototype.initRegisters(),
+          program_counter: 0
+        };
+        state.registers[0] = 0xFF;
+        state.registers[1] = 0x1;
+        var expected_vx = 0x2;
+        var expected_pc = 2;
+        var expected_vf = 0;
+
+        actual.call(undefined, opcode, state);
+        expect(state.registers[0]).toBe(expected_vx);
+        expect(state.program_counter).toBe(expected_pc);
+        expect(state.registers[0xF]).toBe(expected_vf);
       });
     });
 

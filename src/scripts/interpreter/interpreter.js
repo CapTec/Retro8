@@ -20,12 +20,14 @@ define(function(require) {
     this.display = initDisplay(width, height);
     this.keyboard = initKeyboard();
     this.stack = initStack();
+    this.reset = reset;
+    this.loadFont = loadFont;
+    this.cycle = cycle;
+    this.handleTimers = handleTimers;
+    loadFont.call(this);
   }
 
   Interpreter.prototype = {
-    cycle: cycle,
-    loadFont: loadFont,
-    reset: reset,
     program_counter: 0x200,
     stack_pointer: 0,
     index_register: 0,
@@ -41,6 +43,7 @@ define(function(require) {
   reset = function reset() {
     this.program_counter = 0x200;
     this.stack = initStack();
+    this.stack_pointer = 0;
     this.index_register = 0;
     this.registers = initRegisters();
     this.memory = initMemory();
@@ -48,6 +51,7 @@ define(function(require) {
     this.keyboard = initKeyboard();
     this.delayTimer = 0;
     this.soundTimer = 0;
+    this.loadFont();
   };
 
   function initStack() {
@@ -75,17 +79,18 @@ define(function(require) {
   }
 
   cycle = function cycle() {
-    var opcode = this.memory[this.program_counter] << 8,
-      op;
+    var opcode = this.memory[this.program_counter];
+    var op;
+    opcode <<= 8;
+    opcode |= this.memory[this.program_counter + 1];
 
     try {
-      op = operations.getOps(opcode); // decode
+      op = operations.getOps(opcode, this); // decode
     } catch (err) {
       // error occurred decoding the current opcode.
     }
-
     try {
-      op.call(this, opcode); // execute
+      op.call(undefined, opcode, this); // execute
     } catch (err) {
       // opcode execution logic error occurred. Handle appropriately
     }
@@ -101,15 +106,13 @@ define(function(require) {
       this.delayTimer -= 1;
 
     if (this.soundTimer > 0) {
-      if (this.soundTimer === 1) {
-        //dispatch beep sound here.
-      }
+      // dispatch beep sound here.
       this.soundTimer -= 1;
     }
   };
 
   /*
-   * Fonts are loaded into the reserved intepreter memory
+   * Fonts are loaded into the reserved interpreter memory
    * space (0x000 to 0x1FF)
    */
   loadFont = function loadFont() {
