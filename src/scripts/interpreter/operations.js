@@ -1,4 +1,4 @@
-define(['./reg0', './reg8', './rege', './regf', './errors/notimplemented', './errors/notrecognised'], function(reg0, reg8, regE, regF, CodeNotImplemented, CodeNotRecognised) {
+define(['./reg0', './reg8', './rege', './regf', './errors/notrecognised'], function(reg0, reg8, regE, regF, CodeNotRecognised) {
   'use strict';
 
   var operations = {
