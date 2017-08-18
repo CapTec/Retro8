@@ -175,7 +175,7 @@ define(['./reg0', './reg8', './rege', './regf', './errors/notimplemented', './er
    */
   function setIndexToAddr(opcode) {
     var nnn = opcode & 0x0FFF;
-    
+
     this.index_register = nnn;
     this.program_counter += 2;
   }
@@ -184,11 +184,14 @@ define(['./reg0', './reg8', './rege', './regf', './errors/notimplemented', './er
    * Jumps to the address NNN plus V0.
    * psuedo: PC=V0+NNN
    * operator type: Flow
-   * opcode: BXNN
+   * opcode: BNNN
    * @param {UInt8} opcode - 8 bit opcode value
    */
   function jmpToAddrPlsV0(opcode) {
-    throw new CodeNotImplemented(opcode);
+    var v0 = this.registers[0];
+    var nnn = (opcode & 0x0FFF);
+
+    this.program_counter = nnn + v0;
   }
 
   /*
