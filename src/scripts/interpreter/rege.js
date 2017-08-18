@@ -24,7 +24,7 @@ define(['./errors/notimplemented'], function(CodeNotImplemented) {
     if(this.keyboard[key] === 0x1) {
       this.program_counter += 2;
     }
-    
+
     this.program_counter += 2;
   }
 
@@ -36,8 +36,14 @@ define(['./errors/notimplemented'], function(CodeNotImplemented) {
    * @param {UInt8} opcode - 8 bit opcode value
    */
   function skipIfVxNotPressed(opcode) {
-    this.program_counter += 4;
-    throw new CodeNotImplemented(opcode);
+    var vx = (opcode & 0x0F00) >> 8;
+    var key = this.registers[vx];
+
+    if(this.keyboard[key] === 0x0) {
+      this.program_counter += 2;
+    }
+
+    this.program_counter += 2;
   }
 
   return {
