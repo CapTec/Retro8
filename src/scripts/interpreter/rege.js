@@ -1,4 +1,4 @@
-define(['./errors/notimplemented'], function(CodeNotImplemented) {
+define(function() {
   'use strict';
 
   var operations = {
