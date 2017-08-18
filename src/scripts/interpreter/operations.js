@@ -203,7 +203,11 @@ define(['./reg0', './reg8', './rege', './regf', './errors/notimplemented', './er
    * @param {UInt8} opcode - 8 bit opcode value
    */
   function bitSetVxRandAndV0(opcode) {
-    throw new CodeNotImplemented(opcode);
+    var vx = (opcode & 0x0F00) >> 8;
+    var nn = (opcode & 0x00FF);
+
+    this.registers[vx] = Math.floor(Math.random() * 256) & nn;
+    this.program_counter += 2;
   }
 
   /*
