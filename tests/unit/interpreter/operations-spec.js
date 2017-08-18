@@ -1,4 +1,7 @@
 define(["src/scripts/interpreter/operations", "src/scripts/interpreter/interpreter"], function(operations, Interpreter) {
+  var reg0 = require('src/scripts/interpreter/reg0'),
+   CodeNotRecognised = require('src/scripts/interpreter/errors/notrecognised');
+
   describe('operations', function() {
     describe('getOps(1NNN', function() {
       var opcode = 0x1FFF;
@@ -66,6 +69,17 @@ define(["src/scripts/interpreter/operations", "src/scripts/interpreter/interpret
         actual.call(state, opcode);
         expect(state.program_counter).toBe(expected_pc);
       });
+
+      it('should increment program_counter by 2 if Vx not equals NN', function() {
+        var state = {
+          program_counter: 0,
+          registers: [0x08]
+        };
+        var expected_pc = 2;
+
+        actual.call(state, opcode);
+        expect(state.program_counter).toBe(expected_pc);
+      });
     });
 
     describe('getOps(4XNN)', function() {
@@ -88,6 +102,17 @@ define(["src/scripts/interpreter/operations", "src/scripts/interpreter/interpret
         actual.call(state, opcode);
         expect(state.program_counter).toBe(expected_pc);
       });
+
+      it('should increment program_counter by 2 if Vx equal NN', function() {
+        var state = {
+          program_counter: 0,
+          registers: [0x0]
+        };
+        var expected_pc = 2;
+
+        actual.call(state, opcode);
+        expect(state.program_counter).toBe(expected_pc);
+      });
     });
 
     describe('getOps(5XY0)', function() {
@@ -106,6 +131,17 @@ define(["src/scripts/interpreter/operations", "src/scripts/interpreter/interpret
           registers: [0x12, 0x12]
         };
         var expected_pc = 4;
+
+        actual.call(state, opcode);
+        expect(state.program_counter).toBe(expected_pc);
+      });
+
+      it('should increment program_counter by 2 if Vx not eq Vy', function() {
+        var state = {
+          program_counter: 0,
+          registers: [0x12, 0x16]
+        };
+        var expected_pc = 2;
 
         actual.call(state, opcode);
         expect(state.program_counter).toBe(expected_pc);
@@ -283,10 +319,10 @@ define(["src/scripts/interpreter/operations", "src/scripts/interpreter/interpret
 
       it('should draw 8x1 sprite, set pc to 2 and VF to 0', function() {
         var state = {
-            display: Interpreter.prototype.display,
+            display: Interpreter.prototype.initDisplay(64, 32),
             registers: [0x1B, 0x0], // display at x:27, y:0
             program_counter: 0,
-            memory: Interpreter.prototype.memory,
+            memory: Interpreter.prototype.initMemory(),
             index_register: 0x200
           },
           expected_off_pixel = 0x0,
@@ -309,10 +345,10 @@ define(["src/scripts/interpreter/operations", "src/scripts/interpreter/interpret
 
       it('should draw 8x1 sprite, set pc to 2 and VF to 1', function() {
         var state = {
-            display: Interpreter.prototype.display,
+            display: Interpreter.prototype.initDisplay(64, 32),
             registers: [0x1B, 0x0], // display at x:27, y:0
             program_counter: 0,
-            memory: Interpreter.prototype.memory,
+            memory: Interpreter.prototype.initMemory(),
             index_register: 0x200
           },
           expected_off_pixel = 0x0,
@@ -333,6 +369,63 @@ define(["src/scripts/interpreter/operations", "src/scripts/interpreter/interpret
 
         expect(state.program_counter).toBe(expected_pc);
         expect(state.registers[0xF]).toBe(expected_vf);
+      });
+    });
+
+    describe('getOps(undefined)', function() {
+      var opcode = 'undefined';
+
+      it('should throw CodeNotRecognised error', function() {
+        function actual() {
+          return operations.getOps(opcode);
+        };
+
+        expect(actual).toThrowError(CodeNotRecognised);
+      });
+    });
+
+    describe('getOps(0x0000)', function() {
+      var opcode = 0x0000;
+
+      it('should get callRca', function() {
+        var actual = operations.getOps(opcode);
+        expect(actual.prototype.constructor.name).toBe('callRca');
+      });
+    });
+
+    describe('getOps(0x8008)', function() {
+      var opcode = 0x8008; // unrecognised 8 code
+
+      it('should throw CodeNotRecognised', function() {
+        var actual = function() {
+        return operations.getOps(opcode);
+      };
+
+        expect(actual).toThrowError(CodeNotRecognised);
+      });
+    });
+
+    describe('getOps(0xE0BB)', function() {
+      var opcode = 0xE0BB; // unrecognised E code
+
+      it('should throw CodeNotRecognised', function() {
+        var actual = function() {
+        return operations.getOps(opcode);
+      };
+
+        expect(actual).toThrowError(CodeNotRecognised);
+      });
+    });
+
+    describe('getOps(0xF0BB)', function() {
+      var opcode = 0xF0BB; // unrecognised F code
+
+      it('should throw CodeNotRecognised', function() {
+        var actual = function() {
+        return operations.getOps(opcode);
+      };
+
+        expect(actual).toThrowError(CodeNotRecognised);
       });
     });
   });

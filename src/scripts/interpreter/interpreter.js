@@ -1,75 +1,30 @@
-define(['./operations'], function(operations) {
+define(['./operations', './font'], function(operations, font) {
   'use strict';
 
-  var memoryLimit = 4096;
-  var registerCount = 16;
-  var width = 64;
-  var height = 32;
-  var font = [
-    0xF0, 0x90, 0x90, 0x90, 0xF0, // 0
-    0x20, 0x60, 0x20, 0x20, 0x70, // 1
-    0xF0, 0x10, 0xF0, 0x80, 0xF0, // 2
-    0xF0, 0x10, 0xF0, 0x10, 0xF0, // 3
-    0x90, 0x90, 0xF0, 0x10, 0x10, // 4
-    0xF0, 0x80, 0xF0, 0x10, 0xF0, // 5
-    0xF0, 0x80, 0xF0, 0x90, 0xF0, // 6
-    0xF0, 0x10, 0x20, 0x40, 0x40, // 7
-    0xF0, 0x90, 0xF0, 0x90, 0xF0, // 8
-    0xF0, 0x90, 0xF0, 0x10, 0xF0, // 9
-    0xF0, 0x90, 0xF0, 0x90, 0x90, // A
-    0xE0, 0x90, 0xE0, 0x90, 0xE0, // B
-    0xF0, 0x80, 0x80, 0x80, 0xF0, // C
-    0xE0, 0x90, 0x90, 0x90, 0xE0, // D
-    0xF0, 0x80, 0xF0, 0x80, 0xF0, // E
-    0xF0, 0x80, 0xF0, 0x80, 0x80  // F
-  ];
-  var keyboard = {
-    0x1: { value: 0 },
-    0x2: { value: 0 },
-    0x3: { value: 0 },
-    0xC: { value: 0 },
-    0x4: { value: 0 },
-    0x5: { value: 0 },
-    0x6: { value: 0 },
-    0xD: { value: 0 },
-    0x7: { value: 0 },
-    0x8: { value: 0 },
-    0x9: { value: 0 },
-    0xE: { value: 0 },
-    0xA: { value: 0 },
-    0x0: { value: 0 },
-    0xB: { value: 0 },
-    0xF: { value: 0 }
-  };
+  var memoryLimit = 4096,
+    registerCount = 16,
+    width = 64,
+    height = 32;
 
   function Interpreter() {
-    /* reduce flicker should return an alternate draw call function
-     * The initial draw at x and y,
-     * Start loop,
-     * Store X and Y in XSaved and YSaved,
-     * Alter X or Y due to keys,
-     * if XSaved <> x or YSaved <> y then
-     * Undraw object at XSaved and YSaved,
-     * Redraw object at x and y,
-     * Endif
-     * Repeat Loop.
-     */
+    this.registers = initRegisters();
+    this.memory = initMemory();
+    this.display = initDisplay(width, height);
+    this.keyboard = initKeyboard();
   }
 
   Interpreter.prototype = {
     cycle: cycle,
     loadFont: loadFont,
-    initDisplay: initDisplay,
     reset: reset,
     program_counter: 0x200,
     stack_pointer: 0,
     index_register: 0,
+    initDisplay: initDisplay,
+    initMemory: initMemory,
+    initRegisters: initRegisters,
+    initKeyboard: initKeyboard,
     stack: [],
-    registers: new Uint8Array(registerCount),
-    memory: new Uint8Array(memoryLimit),
-    display: initDisplay(width, height),
-    reduceFlicker: false,
-    keyboard: Object.create(Object.prototype, keyboard),
     delayTimer: 0,
     soundTimer: 0
   };
@@ -77,13 +32,21 @@ define(['./operations'], function(operations) {
   function reset() {
     this.program_counter = 0x200;
     this.stack = [];
-    this.registers = new Uint8Array(registerCount);
     this.index_register = 0;
-    this.memory = new Uint8Array(memoryLimit);
+    this.registers = initRegisters();
+    this.memory = initMemory();
     this.display = initDisplay(width, height);
-    this.keyboard = Object.create(Object.prototype, keyboard);
+    this.keyboard = initKeyboard();
     this.delayTimer = 0;
     this.soundTimer = 0;
+  }
+
+  function initRegisters() {
+    return new Uint8Array(registerCount);
+  }
+
+  function initMemory() {
+    return new Uint8Array(memoryLimit)
   }
 
   function initDisplay(w, h) {
@@ -99,23 +62,35 @@ define(['./operations'], function(operations) {
   }
 
   function cycle() {
-    // need independent delay and sound timers that count down at 60Hz.
-    // request animation frame should do this. Possibly shift the timers to their own
-    // background workers. Additionally main emulation speed should be 1.75MHz / 60Hz = ops/sec
-    // wait until the next vsync for any more.
-
-    var opcode = this.memory[this.program_counter] << 8;
+    var opcode = this.memory[this.program_counter] << 8; // fetch
 
     try {
-      var op = operations.getOps(opcode);
+      var op = operations.getOps(opcode); // decode
     } catch (err) {
       // error occurred decoding the current opcode.
     }
 
     try {
-      op.call(this, opcode);
+      op.call(this, opcode); // execute
     } catch (err) {
       // opcode execution logic error occurred. Handle appropriately
+    }
+
+    handleTimers.call(this);
+  }
+
+  /*
+   * Decrements Chip8 timers if > 0
+   */
+  function handleTimers() {
+    if (this.delayTimer > 0)
+      this.delayTimer -= 1;
+
+    if (this.soundTimer > 0) {
+      if (this.soundTimer === 1) {
+        //dispatch beep sound here.
+      }
+      this.soundTimer -= 1;
     }
   }
 
@@ -128,6 +103,27 @@ define(['./operations'], function(operations) {
     for (var i = 0; i < length; i++) {
       this.memory[i] = font[i];
     }
+  }
+
+  function initKeyboard() {
+    return {
+      0x1: 0,
+      0x2: 0,
+      0x3: 0,
+      0xC: 0,
+      0x4: 0,
+      0x5: 0,
+      0x6: 0,
+      0xD: 0,
+      0x7: 0,
+      0x8: 0,
+      0x9: 0,
+      0xE: 0,
+      0xA: 0,
+      0x0: 0,
+      0xB: 0,
+      0xF: 0
+    };
   }
 
   return Interpreter;

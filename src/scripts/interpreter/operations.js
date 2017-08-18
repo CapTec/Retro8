@@ -23,7 +23,9 @@ define(['./reg0', './reg8', './rege', './regf', './errors/notrecognised'], funct
   function getOps(opcode) {
     var op = null;
 
-    if (operations[(opcode & 0xF000)] === reg0.getOps) {
+    if(typeof opcode !== 'number') {
+      throw new CodeNotRecognised(opcode);
+    } else if (operations[(opcode & 0xF000)] === reg0.getOps) {
       op = reg0.getOps(opcode);
     } else if (operations[(opcode & 0xF000)] === reg8.getOps) {
       op = reg8.getOps(opcode);
@@ -35,8 +37,9 @@ define(['./reg0', './reg8', './rege', './regf', './errors/notrecognised'], funct
       op = operations[(opcode & 0xF000)];
     }
 
-    if (typeof op === 'undefined')
+    if (typeof op === 'undefined') {
       throw new CodeNotRecognised(opcode);
+    }
 
     return op;
   }
@@ -81,8 +84,10 @@ define(['./reg0', './reg8', './rege', './regf', './errors/notrecognised'], funct
     var vx = (opcode & 0x0F00) >> 8,
       nn = opcode & 0x00FF;
 
-    if (this.registers[vx] === nn)
-      this.program_counter += 4;
+    if (this.registers[vx] === nn) {
+      this.program_counter += 2;
+    }
+    this.program_counter += 2;
   }
 
   /*
@@ -97,8 +102,10 @@ define(['./reg0', './reg8', './rege', './regf', './errors/notrecognised'], funct
     var vx = (opcode & 0x0F00) >> 8,
       nn = opcode & 0x00FF;
 
-    if (this.registers[vx] !== nn)
-      this.program_counter += 4;
+    if (this.registers[vx] !== nn) {
+      this.program_counter += 2;
+    }
+    this.program_counter += 2;
   }
 
   /*
@@ -113,8 +120,10 @@ define(['./reg0', './reg8', './rege', './regf', './errors/notrecognised'], funct
     var vx = (opcode & 0x0F00) >> 8,
       vy = (opcode & 0x00F0) >> 4;
 
-    if (this.registers[vx] === this.registers[vy])
-      this.program_counter += 4;
+    if (this.registers[vx] === this.registers[vy]) {
+      this.program_counter += 2;
+    }
+    this.program_counter += 2;
   }
 
   /*

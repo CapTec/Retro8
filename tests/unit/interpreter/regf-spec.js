@@ -72,7 +72,7 @@ define(["src/scripts/interpreter/regf", "src/scripts/interpreter/interpreter"], 
       it('should block if no key pressed, pc should remain unchanged', function() {
         var state = {
           registers: [0xA],
-          keyboard: Interpreter.prototype.keyboard,
+          keyboard: Interpreter.prototype.initKeyboard(),
           program_counter: 0
         };
 
@@ -226,7 +226,7 @@ define(["src/scripts/interpreter/regf", "src/scripts/interpreter/interpreter"], 
       it('dumps registers V0 through to Vx to memory starting at index_register', function() {
         var state = {
             registers: [0x1, 0x2, 0x3],
-            memory: Interpreter.prototype.memory,
+            memory: Interpreter.prototype.initMemory(),
             index_register: 0x200,
             program_counter: 0
           },
@@ -260,7 +260,7 @@ define(["src/scripts/interpreter/regf", "src/scripts/interpreter/interpreter"], 
       it('should set V0 - Vx with values from memory starting at index_register address', function() {
         var state = {
           registers: [0x0, 0x0, 0x0],
-          memory: Interpreter.prototype.memory,
+          memory: Interpreter.prototype.initMemory(),
           index_register: 0x200,
           program_counter: 0
         };
