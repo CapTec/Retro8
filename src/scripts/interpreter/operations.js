@@ -1,4 +1,4 @@
-define(['./reg0', './reg8', './rege', './regf', './notimplemented'], function(reg0, reg8, regE, regF, CodeNotImplemented) {
+define(['./reg0', './reg8', './rege', './regf', './errors/notimplemented', './errors/notrecognised'], function(reg0, reg8, regE, regF, CodeNotImplemented, CodeNotRecognised) {
   'use strict';
 
   var operations = {
@@ -14,7 +14,7 @@ define(['./reg0', './reg8', './rege', './regf', './notimplemented'], function(re
     0x9000: skipIfVxNotVy,
     0xA000: setIndexToAddr,
     0xB000: jmpToAddrPlsV0,
-    0xC000: bitRandAndV0,
+    0xC000: bitSetVxRandAndV0,
     0XD000: draw,
     0xE000: regE.getOps,
     0xF000: regF.getOps
@@ -36,7 +36,7 @@ define(['./reg0', './reg8', './rege', './regf', './notimplemented'], function(re
     }
 
     if (typeof op === 'undefined')
-      throw new CodeNotImplemented(opcode);
+      throw new CodeNotRecognised(opcode);
 
     return op;
   }
@@ -64,6 +64,7 @@ define(['./reg0', './reg8', './rege', './regf', './notimplemented'], function(re
   function gosub(opcode) {
     var nnn = opcode & 0x0FFF;
 
+    this.stack_pointer += 1;
     this.stack.push(this.program_counter);
     this.program_counter = nnn;
   }
@@ -155,7 +156,14 @@ define(['./reg0', './reg8', './rege', './regf', './notimplemented'], function(re
    * @param {UInt8} opcode - 8 bit opcode value
    */
   function skipIfVxNotVy(opcode) {
-    throw new CodeNotImplemented();
+    var vx = (opcode & 0x0F00) >> 8,
+      vy = (opcode & 0x00F0) >> 4;
+
+      this.program_counter += 2;
+
+      if(this.registers[vx] !== this.registers[vy]) {
+        this.program_counter += 2;
+      }
   }
 
   /*
@@ -166,7 +174,8 @@ define(['./reg0', './reg8', './rege', './regf', './notimplemented'], function(re
    * @param {UInt8} opcode - 8 bit opcode value
    */
   function setIndexToAddr(opcode) {
-    throw new CodeNotImplemented();
+    var nnn = opcode & 0x0FFF;
+    this.index_register = nnn;
   }
 
   /*
@@ -177,7 +186,7 @@ define(['./reg0', './reg8', './rege', './regf', './notimplemented'], function(re
    * @param {UInt8} opcode - 8 bit opcode value
    */
   function jmpToAddrPlsV0(opcode) {
-    throw new CodeNotImplemented();
+    throw new CodeNotImplemented(opcode);
   }
 
   /*
@@ -188,23 +197,48 @@ define(['./reg0', './reg8', './rege', './regf', './notimplemented'], function(re
    * opcode: CXNN
    * @param {UInt8} opcode - 8 bit opcode value
    */
-  function bitRandAndV0(opcode) {
-    throw new CodeNotImplemented();
+  function bitSetVxRandAndV0(opcode) {
+    throw new CodeNotImplemented(opcode);
   }
 
   /*
    * Draws a sprite at coordinate (VX, VY) that has a width of 8 pixels and a height of N pixels.
    * Each row of 8 pixels is read as bit-coded starting from memory location I;
    * I value doesn’t change after the execution of this instruction.
-   * As described above, VF is set to 1 if any screen pixels are flipped
-   * from set to unset when the sprite is drawn, and to 0 if that doesn’t happen
+   * As described above, VF is set to 1 if any screen pixels are flipped from set to unset
+   * when the sprite is drawn, and to 0 if that doesn’t happen
    * psuedo: 	draw(Vx,Vy,N)
    * operator type: Display
    * opcode: DXYN
    * @param {UInt8} opcode - 8 bit opcode value
    */
   function draw(opcode) {
-    throw new CodeNotImplemented();
+    var vx = (opcode & 0x0F00) >> 8;
+    var vy = (opcode & 0x00F0) >> 4;
+    var height = (opcode & 0x000F);
+
+    var coordx = this.registers[vx];
+    var coordy = this.registers[vy];
+
+    this.registers[0xF] = 0x0;
+
+    for(var y = 0; y < height; y++) {
+      var sprite_byte = this.memory[this.index_register + y];
+
+      for(var x = 0; x < 8; x++) {
+        var bit = sprite_byte & (0x80 >> x);
+
+        if(bit !== 0x0) {
+          if(this.display[coordx + x][coordy + y] === 0x1) {
+            this.registers[0xF] = 1;
+          }
+
+          this.display[coordx + x][coordy + y] ^= 0x1;
+        }
+      }
+    }
+
+    this.program_counter += 2;
   }
 
   return {

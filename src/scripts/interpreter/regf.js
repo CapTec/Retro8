@@ -1,4 +1,4 @@
-define(['./notimplemented'], function(CodeNotImplemented) {
+define(['./errors/notimplemented'], function(CodeNotImplemented) {
   'use strict';
 
   var operations = {
@@ -25,7 +25,8 @@ define(['./notimplemented'], function(CodeNotImplemented) {
    * @param {UInt8} opcode - 8 bit opcode value
    */
   function setVxToDelay(opcode) {
-    throw new CodeNotImplemented();
+    this.program_counter += 2;
+    throw new CodeNotImplemented(opcode);
   }
 
   /*
@@ -37,7 +38,8 @@ define(['./notimplemented'], function(CodeNotImplemented) {
    * @param {UInt8} opcode - 8 bit opcode value
    */
   function setVxToKey(opcode) {
-    throw new CodeNotImplemented();
+    this.program_counter += 2;
+    throw new CodeNotImplemented(opcode);
   }
 
   /*
@@ -48,7 +50,8 @@ define(['./notimplemented'], function(CodeNotImplemented) {
    * @param {UInt8} opcode - 8 bit opcode value
    */
   function setDelayTimer(opcode) {
-    throw new CodeNotImplemented();
+    this.program_counter += 2;
+    throw new CodeNotImplemented(opcode);
   }
 
   /*
@@ -59,7 +62,8 @@ define(['./notimplemented'], function(CodeNotImplemented) {
    * @param {UInt8} opcode - 8 bit opcode value
    */
   function setSoundTimer(opcode) {
-    throw new CodeNotImplemented();
+    this.program_counter += 2;
+    throw new CodeNotImplemented(opcode);
   }
 
   /*
@@ -70,7 +74,8 @@ define(['./notimplemented'], function(CodeNotImplemented) {
    * @param {UInt8} opcode - 8 bit opcode value
    */
   function addVxToIdxReg(opcode) {
-    throw new CodeNotImplemented();
+    this.program_counter += 2;
+    throw new CodeNotImplemented(opcode);
   }
 
   /*
@@ -82,7 +87,8 @@ define(['./notimplemented'], function(CodeNotImplemented) {
    * @param {UInt8} opcode - 8 bit opcode value
    */
   function setIdxToSprite(opcode) {
-    throw new CodeNotImplemented();
+    this.program_counter += 2;
+    throw new CodeNotImplemented(opcode);
   }
 
   /*
@@ -101,7 +107,14 @@ define(['./notimplemented'], function(CodeNotImplemented) {
    * @param {UInt8} opcode - 8 bit opcode value
    */
   function setBcd(opcode) {
-    throw new CodeNotImplemented();
+    var vx = this.registers[(opcode & 0x0F00)];
+
+    for(var i = 3; i > 0; i--) { // i is set to the decimal number size
+      this.memory[this.index_register + i - 1] = parseInt(vx % 10); // we modulo by 10 to get the BCD
+      vx = Math.floor(vx / 10); // reduces the decimal number to its next lowest unit
+    }
+
+    this.program_counter += 2;
   }
 
   /*
@@ -112,7 +125,8 @@ define(['./notimplemented'], function(CodeNotImplemented) {
    * @param {UInt8} opcode - 8 bit opcode value
    */
   function regDump(opcode) {
-    throw new CodeNotImplemented();
+    this.program_counter += 2;
+    throw new CodeNotImplemented(opcode);
   }
 
   /*
@@ -123,7 +137,8 @@ define(['./notimplemented'], function(CodeNotImplemented) {
    * @param {UInt8} opcode - 8 bit opcode value
    */
   function regLoad(opcode) {
-    throw new CodeNotImplemented();
+    this.program_counter += 2;
+    throw new CodeNotImplemented(opcode);
   }
 
   return {

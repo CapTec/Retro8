@@ -2,7 +2,7 @@ define(function() {
   'use strict';
   function CodeNotImplemented(opcode) {
     this.name = 'CodeNotImplemented';
-    this.message = 'The opcode ' + opcode.toString(16) + ' has not yet been implemented';
+    this.message = 'The opcode 0x' + opcode.toString(16).toUpperCase() + ' has not yet been implemented';
     this.stack = (new Error()).stack;
   }
 

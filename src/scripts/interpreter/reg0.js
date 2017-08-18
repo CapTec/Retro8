@@ -1,4 +1,4 @@
-define(['./notimplemented'],function(CodeNotImplemented) {
+define(['./errors/notimplemented'], function(CodeNotImplemented) {
   'use strict';
 
   var operations = {
@@ -16,7 +16,7 @@ define(['./notimplemented'],function(CodeNotImplemented) {
   }
 
   /*
-   * Calls RCA 1802 program at address NNN. Not necessary for most ROMs.
+   * Calls RCA 1802 program at address NNN. Not necessary for most Chip8 Software.
    * pseudo: n/a
    * operator type: Call
    * opcode: 0x0NNN
@@ -34,7 +34,14 @@ define(['./notimplemented'],function(CodeNotImplemented) {
    * @param {UInt8} opcode - 8 bit opcode value
    */
   function clearDisplay(opcode) {
-    throw new CodeNotImplemented(opcode);
+    var width = this.display.length;
+    for(var i = 0; i < width; i++) {
+      var height = this.display[i].length;
+      for(var j = 0; j < height; j++) {
+        this.display[i][j] = 0;
+      }
+    }
+    this.program_counter += 2;
   }
 
   /*
@@ -45,7 +52,9 @@ define(['./notimplemented'],function(CodeNotImplemented) {
    * @param {UInt8} opcode - 8 bit opcode value
    */
   function returnFrom(opcode) {
-    throw new CodeNotImplemented(opcode);
+    // The interpreter sets the program counter to the address at the top of the stack, then subtracts 1 from the stack pointer.
+    this.program_counter = this.stack[this.stack.length - 1];
+    this.stack_pointer -= 1;
   }
 
   return {

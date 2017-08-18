@@ -1,6 +1,6 @@
 {
-  "name": "Chip8",
-  "description": "A Chil8 interpreter implemented in native javascript",
+  "name": "Retro8",
+  "description": "A Chip8 interpreter implemented in native javascript",
   "version": "1.0.0",
   "devDependencies": {
     "browserify": "^14.4.0",
@@ -16,7 +16,9 @@
     "karma-jasmine": "^1.1.0",
     "karma-phantomjs2-launcher": "^0.5.0",
     "karma-requirejs": "^1.1.0",
+    "karma-sinon": "^1.0.5",
     "requirejs": "^2.3.4",
+    "sinon": "^3.2.0",
     "watchify": "^3.9.0"
   },
   "scripts": {

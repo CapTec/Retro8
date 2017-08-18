@@ -1,19 +1,20 @@
 define(function() {
   'use strict';
 
+  var operations = {
+    0x0000: setVxToVy,
+    0x0001: setVxToVxOrVy,
+    0x0002: setVxToVxAndVy,
+    0x0003: setVxToVxXorVy,
+    0x0004: setVxToVxPlusVy,
+    0x0005: setVxToVxMinusVy,
+    0x0006: shiftVxRight,
+    0x0007: setVxEqVyMinusVx,
+    0x000E: shiftVxLeft
+  };
+
   function getOps(opcode) {
-    var vops = {
-      0x0000: setVxToVy,
-      0x0001: setVxToVxOrVy,
-      0x0002: setVxToVxAndVy,
-      0x0003: setVxToVxXorVy,
-      0x0004: setVxToVxPlusVy,
-      0x0005: setVxToVxMinusVy,
-      0x0006: shiftVxRight,
-      0x0007: setVxEqVyMinusVx,
-      0x000E: shiftVxLeft
-    }
-    return vops[(opcode & 0x000F)];
+    return operations[(opcode & 0x000F)];
   }
 
   /*
