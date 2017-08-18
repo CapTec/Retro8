@@ -106,7 +106,7 @@ define(["src/scripts/interpreter/regf", "src/scripts/interpreter/interpreter"], 
         actual.call(state, opcode);
 
         expect(state.delayTimer).toEqual(expected_dt);
-        expect(state.delayTimer).toEqual(expected_pc);
+        expect(state.program_counter).toEqual(expected_pc);
       });
     });
 
