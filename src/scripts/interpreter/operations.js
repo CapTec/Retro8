@@ -175,7 +175,9 @@ define(['./reg0', './reg8', './rege', './regf', './errors/notimplemented', './er
    */
   function setIndexToAddr(opcode) {
     var nnn = opcode & 0x0FFF;
+    
     this.index_register = nnn;
+    this.program_counter += 2;
   }
 
   /*
