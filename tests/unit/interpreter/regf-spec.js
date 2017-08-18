@@ -38,17 +38,35 @@ define(["src/scripts/interpreter/regf", "src/scripts/interpreter/interpreter"], 
 
       it('should set Vx to current pressed key (blocking) and increment pc', function() {
         var state = {
-          registers: [0xA],
-          keyboard: Interpreter.prototype.keyboard,
+          registers: [0x0],
+          keyboard: {
+            0x1: 0,
+            0x2: 0,
+            0x3: 0,
+            0xC: 0,
+            0x4: 0,
+            0x5: 0,
+            0x6: 0,
+            0xD: 0,
+            0x7: 0,
+            0x8: 0,
+            0x9: 0,
+            0xE: 0,
+            0xA: 1,
+            0x0: 0,
+            0xB: 0,
+            0xF: 0
+          },
           program_counter: 0
         };
 
-        state.keyboard[0xA] = 1; // 0xA key pressed
         var expected_pc = 2;
+        var expected_vx = 0xA;
 
         actual.call(state, opcode);
 
         expect(state.program_counter).toBe(expected_pc);
+        expect(state.registers[0]).toEqual(expected_vx);
       });
 
       it('should block if no key pressed, pc should remain unchanged', function() {

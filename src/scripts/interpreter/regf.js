@@ -40,8 +40,24 @@ define(['./errors/notimplemented'], function(CodeNotImplemented) {
    * @param {UInt8} opcode - 8 bit opcode value
    */
   function setVxToKey(opcode) {
+    var pressed = false;
+    var key = null;
+
+    for (var prop in this.keyboard) {
+      if (this.keyboard[prop] !== 1)
+        continue;
+      pressed = true;
+      key = prop;
+      break;
+    }
+
+    if (pressed !== true)
+      return;
+
+    var vx = (opcode & 0x0F00) >> 8;
+    key = typeof key === 'string' ? parseInt(key, 10) : key;
+    this.registers[vx] = key;
     this.program_counter += 2;
-    throw new CodeNotImplemented(opcode);
   }
 
   /*
@@ -111,7 +127,7 @@ define(['./errors/notimplemented'], function(CodeNotImplemented) {
   function setBcd(opcode) {
     var vx = this.registers[(opcode & 0x0F00)];
 
-    for(var i = 3; i > 0; i--) { // i is set to the decimal number size
+    for (var i = 3; i > 0; i--) { // i is set to the decimal number size
       this.memory[this.index_register + i - 1] = parseInt(vx % 10); // we modulo by 10 to get the BCD
       vx = Math.floor(vx / 10); // reduces the decimal number to its next lowest unit
     }
@@ -128,7 +144,7 @@ define(['./errors/notimplemented'], function(CodeNotImplemented) {
    */
   function regDump(opcode) {
     var vx = (opcode & 0x0F00) >> 8;
-    for(var i = 0; i <= vx; i++) {
+    for (var i = 0; i <= vx; i++) {
       this.memory[this.index_register + i] = this.registers[i];
     }
 
