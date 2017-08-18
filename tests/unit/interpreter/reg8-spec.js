@@ -151,18 +151,56 @@ define(["src/scripts/interpreter/reg8"], function(reg8) {
         expect(actual.prototype.constructor.name).toBe(expected);
       });
 
-      it('should set Vx to Vx + Vy', function() {
+      it('should set Vx to Vx + Vy and set Vf = 0', function() {
         var state = {
-          registers: [0x2, 0x2],
+          registers: [0x2, 0x2, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0],
           program_counter: 0
         };
 
         var expected_vx = 0x4;
         var expected_pc = 2;
+        var expected_vf = 0x0;
 
         actual.call(state, opcode);
         expect(state.registers[0]).toBe(expected_vx);
         expect(state.program_counter).toBe(expected_pc);
+        expect(state.registers[0xF]).toBe(expected_vf);
+      });
+
+      it('should set Vx to Vx + Vy and set Vf = 1 (overflow)', function() {
+        var state = {
+          registers: new Uint8Array(16),
+          program_counter: 0
+        };
+        state.registers[0] = 0xFF;
+        state.registers[1] = 0xFF;
+
+        var expected_vx = 254;
+        var expected_pc = 2;
+        var expected_vf = 0x1;
+
+        actual.call(state, opcode);
+        expect(state.registers[0]).toBe(expected_vx);
+        expect(state.program_counter).toBe(expected_pc);
+        expect(state.registers[0xF]).toBe(expected_vf);
+      });
+
+      it('should set Vx to Vx + Vy and set Vf = 0 (overflow)', function() {
+        var state = {
+          registers: new Uint8Array(16),
+          program_counter: 0
+        };
+        state.registers[0] = 0x0A;
+        state.registers[1] = 0x0A;
+
+        var expected_vx = 0x14;
+        var expected_pc = 2;
+        var expected_vf = 0x0;
+
+        actual.call(state, opcode);
+        expect(state.registers[0]).toBe(expected_vx);
+        expect(state.program_counter).toBe(expected_pc);
+        expect(state.registers[0xF]).toBe(expected_vf);
       });
     });
 

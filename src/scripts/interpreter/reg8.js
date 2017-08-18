@@ -88,14 +88,13 @@ define(function() {
     var vx = (opcode & 0x0F00) >> 8,
       vy = (opcode & 0x00F0) >> 4;
 
-    var sum = this.registers[vx] + this.registers[vy];
-    if (sum > 0xFF) {
+    this.registers[vx] += this.registers[vy];
+    if (this.registers[vy] > 0xFF - this.registers[vx]) {
       this.registers[0xF] = 1;
     } else {
       this.registers[0xF] = 0;
     }
 
-    this.registers[vx] = sum;
     this.program_counter += 2;
   }
 
