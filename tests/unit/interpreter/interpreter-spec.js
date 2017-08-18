@@ -1,4 +1,6 @@
-define(["src/scripts/interpreter/interpreter"], function(Interpreter) {
+define(function(require) {
+  var Interpreter = require('src/scripts/interpreter/interpreter');
+
   describe('new Interpreter', function() {
     var chip8 = new Interpreter();
     it('sets keyboard to default values', function() {
@@ -44,7 +46,7 @@ define(["src/scripts/interpreter/interpreter"], function(Interpreter) {
     });
 
     it('sets stack to empty array', function() {
-      var expected_stack = [];
+      var expected_stack = Interpreter.prototype.initStack();
 
       expect(chip8.stack).toEqual(expected_stack);
     });

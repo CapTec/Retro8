@@ -1,6 +1,7 @@
-define(["src/scripts/interpreter/operations", "src/scripts/interpreter/interpreter"], function(operations, Interpreter) {
-  var reg0 = require('src/scripts/interpreter/reg0'),
-   CodeNotRecognised = require('src/scripts/interpreter/errors/notrecognised');
+define(["src/scripts/interpreter/interpreter"], function(Interpreter) {
+  var operations = require('src/scripts/interpreter/operations'),
+    reg0 = require('src/scripts/interpreter/reg0'),
+    CodeNotRecognised = require('src/scripts/interpreter/errors/notrecognised');
 
   describe('operations', function() {
     describe('getOps(1NNN', function() {
@@ -19,7 +20,7 @@ define(["src/scripts/interpreter/operations", "src/scripts/interpreter/interpret
         };
         var expected = 0xFFF;
 
-        actual.call(state, opcode);
+        actual.call(undefined, opcode, state);
         expect(state.program_counter).toBe(expected);
       });
     });
@@ -43,7 +44,7 @@ define(["src/scripts/interpreter/operations", "src/scripts/interpreter/interpret
         var expected_pc = 0xFFF;
         var expected_stack = [0x200, 0x300, 0xA00, 0xB00];
 
-        actual.call(state, opcode);
+        actual.call(undefined, opcode, state);
         expect(state.program_counter).toBe(expected_pc);
         expect(state.stack).toEqual(expected_stack);
       });
@@ -62,22 +63,24 @@ define(["src/scripts/interpreter/operations", "src/scripts/interpreter/interpret
       it('should increment program_counter by 4 if Vx equals NN', function() {
         var state = {
           program_counter: 0,
-          registers: [0x02]
+          registers: Interpreter.prototype.initRegisters()
         };
+        state.registers[0] = 0x2; // vx
         var expected_pc = 4;
 
-        actual.call(state, opcode);
+        actual.call(undefined, opcode, state);
         expect(state.program_counter).toBe(expected_pc);
       });
 
       it('should increment program_counter by 2 if Vx not equals NN', function() {
         var state = {
           program_counter: 0,
-          registers: [0x08]
+          registers: Interpreter.prototype.initRegisters()
         };
+        state.registers[0] = 0x08; // vx
         var expected_pc = 2;
 
-        actual.call(state, opcode);
+        actual.call(undefined, opcode, state);
         expect(state.program_counter).toBe(expected_pc);
       });
     });
@@ -95,22 +98,24 @@ define(["src/scripts/interpreter/operations", "src/scripts/interpreter/interpret
       it('should increment program_counter by 4 if Vx not equal NN', function() {
         var state = {
           program_counter: 0,
-          registers: [0x12]
+          registers: Interpreter.prototype.initRegisters()
         };
         var expected_pc = 4;
+        state.registers[0] = 0x12;
 
-        actual.call(state, opcode);
+        actual.call(undefined, opcode, state);
         expect(state.program_counter).toBe(expected_pc);
       });
 
       it('should increment program_counter by 2 if Vx equal NN', function() {
         var state = {
           program_counter: 0,
-          registers: [0x0]
+          registers: Interpreter.prototype.initRegisters()
         };
+        state.registers[0] = 0x0;
         var expected_pc = 2;
 
-        actual.call(state, opcode);
+        actual.call(undefined, opcode, state);
         expect(state.program_counter).toBe(expected_pc);
       });
     });
@@ -128,22 +133,26 @@ define(["src/scripts/interpreter/operations", "src/scripts/interpreter/interpret
       it('should increment program_counter by 4 if Vx eq Vy', function() {
         var state = {
           program_counter: 0,
-          registers: [0x12, 0x12]
+          registers: Interpreter.prototype.initRegisters()
         };
+        state.registers[0] = 0x12;
+        state.registers[1] = 0x12;
         var expected_pc = 4;
 
-        actual.call(state, opcode);
+        actual.call(undefined, opcode, state);
         expect(state.program_counter).toBe(expected_pc);
       });
 
       it('should increment program_counter by 2 if Vx not eq Vy', function() {
         var state = {
           program_counter: 0,
-          registers: [0x12, 0x16]
+          registers: Interpreter.prototype.initRegisters()
         };
+        state.registers[0] = 0x12;
+        state.registers[1] = 0x16;
         var expected_pc = 2;
 
-        actual.call(state, opcode);
+        actual.call(undefined, opcode, state);
         expect(state.program_counter).toBe(expected_pc);
       });
     });
@@ -160,13 +169,14 @@ define(["src/scripts/interpreter/operations", "src/scripts/interpreter/interpret
 
       it('should set Vx to value of NN', function() {
         var state = {
-          registers: [0x82],
+          registers: Interpreter.prototype.initRegisters(),
           program_counter: 0
         };
+        state.registers[0] = 0x82;
         var expected_vx = 0x02;
         var expected_pc = 2;
 
-        actual.call(state, opcode);
+        actual.call(undefined, opcode, state);
         expect(state.registers[0]).toBe(expected_vx);
         expect(state.program_counter).toBe(expected_pc);
       });
@@ -184,14 +194,15 @@ define(["src/scripts/interpreter/operations", "src/scripts/interpreter/interpret
 
       it('should add NN to value of Vx', function() {
         var state = {
-          registers: [0x02],
+          registers: Interpreter.prototype.initRegisters(),
           program_counter: 0
         };
+        state.registers[0] = 0x02;
 
         var expected_vx = 0x04;
         var expected_pc = 2;
 
-        actual.call(state, opcode);
+        actual.call(undefined, opcode, state);
         expect(state.registers[0]).toBe(expected_vx);
         expect(state.program_counter).toBe(expected_pc);
       });
@@ -199,7 +210,7 @@ define(["src/scripts/interpreter/operations", "src/scripts/interpreter/interpret
 
     describe('getOps(9XY0)', function() {
       var opcode = 0x9010;
-      var actual = operations.getOps(opcode)
+      var actual = operations.getOps(opcode);
 
       it('should get skipIfVxNotVy function', function() {
         var expected = 'skipIfVxNotVy';
@@ -209,32 +220,36 @@ define(["src/scripts/interpreter/operations", "src/scripts/interpreter/interpret
 
       it('should increment program_counter + 4 if Vx != Vy', function() {
         var state = {
-          registers: [0x0B, 0x0],
+          registers: Interpreter.prototype.initRegisters(),
           program_counter: 0
         };
+        state.registers[0] = 0x0b;
+        state.registers[1] = 0x0;
 
         var expected_pc = 4;
 
-        actual.call(state, opcode);
+        actual.call(undefined, opcode, state);
         expect(state.program_counter).toBe(expected_pc);
       });
 
       it('should increment program_counter + 2 if Vx == Vy', function() {
         var state = {
-          registers: [0x0B, 0x0B],
+          registers: Interpreter.prototype.initRegisters(),
           program_counter: 0
         };
+        state.registers[0] = 0x0B;
+        state.registers[1] = 0x0B;
 
         var expected_pc = 2;
 
-        actual.call(state, opcode);
+        actual.call(undefined, opcode, state);
         expect(state.program_counter).toBe(expected_pc);
       });
     });
 
     describe('getOps(ANNN)', function() {
       var opcode = 0xA100;
-      var actual = operations.getOps(opcode)
+      var actual = operations.getOps(opcode);
 
       it('should get setIndexToAddr function', function() {
         var expected = 'setIndexToAddr';
@@ -251,7 +266,7 @@ define(["src/scripts/interpreter/operations", "src/scripts/interpreter/interpret
         var expected_ir = 0x100;
         var expected_pc = 2;
 
-        actual.call(state, opcode);
+        actual.call(undefined, opcode, state);
         expect(state.index_register).toBe(expected_ir);
         expect(state.program_counter).toBe(expected_pc);
       });
@@ -259,7 +274,7 @@ define(["src/scripts/interpreter/operations", "src/scripts/interpreter/interpret
 
     describe('getOps(BNNN)', function() {
       var opcode = 0xB100;
-      var actual = operations.getOps(opcode)
+      var actual = operations.getOps(opcode);
 
       it('should get jmpToAddrPlsV0 function', function() {
         var expected = 'jmpToAddrPlsV0';
@@ -270,11 +285,12 @@ define(["src/scripts/interpreter/operations", "src/scripts/interpreter/interpret
       it('should set program_counter to nnn + Vx', function() {
         var state = {
           program_counter: 0,
-          registers: [0xA]
+          registers: Interpreter.prototype.initRegisters()
         };
+        state.registers[0] = 0xA;
         var expected_pc = 0x10A;
 
-        actual.call(state, opcode);
+        actual.call(undefined, opcode, state);
 
         expect(state.program_counter).toBe(expected_pc);
       });
@@ -293,13 +309,14 @@ define(["src/scripts/interpreter/operations", "src/scripts/interpreter/interpret
       it('should set Vx to 0 if rand generates different value to NN and increment program_counter', function() {
         var state = {
             program_counter: 0,
-            registers: [0xAB]
+            registers: Interpreter.prototype.initRegisters()
           },
           expected_pc = 2,
           expected_vx = 0;
+        state.registers[0] = 0xAB;
         Math.random = sinon.stub().returns(0.04);
 
-        actual.call(state, opcode);
+        actual.call(undefined, opcode, state);
 
         expect(state.program_counter).toBe(expected_pc);
         expect(state.registers[0]).toBe(expected_vx);
@@ -320,7 +337,7 @@ define(["src/scripts/interpreter/operations", "src/scripts/interpreter/interpret
       it('should draw 8x1 sprite, set pc to 2 and VF to 0', function() {
         var state = {
             display: Interpreter.prototype.initDisplay(64, 32),
-            registers: [0x1B, 0x0], // display at x:27, y:0
+            registers: Interpreter.prototype.initRegisters(),
             program_counter: 0,
             memory: Interpreter.prototype.initMemory(),
             index_register: 0x200
@@ -330,9 +347,11 @@ define(["src/scripts/interpreter/operations", "src/scripts/interpreter/interpret
           expected_pc = 2,
           expected_vf = 0,
           expected_sprite = 0x18; // 00011000
+        state.registers[0] = 0x1B; // x coord: 27
+        state.registers[1] = 0x0; // y coord: 0
         state.memory[0x200] = expected_sprite;
 
-        actual.call(state, opcode);
+        actual.call(undefined, opcode, state);
 
         expect(state.display[29][0]).toBe(expected_off_pixel);
         expect(state.display[30][0]).toBe(expected_on_pixel);
@@ -346,7 +365,7 @@ define(["src/scripts/interpreter/operations", "src/scripts/interpreter/interpret
       it('should draw 8x1 sprite, set pc to 2 and VF to 1', function() {
         var state = {
             display: Interpreter.prototype.initDisplay(64, 32),
-            registers: [0x1B, 0x0], // display at x:27, y:0
+            registers: Interpreter.prototype.initRegisters(), // display at x:27, y:0
             program_counter: 0,
             memory: Interpreter.prototype.initMemory(),
             index_register: 0x200
@@ -359,8 +378,10 @@ define(["src/scripts/interpreter/operations", "src/scripts/interpreter/interpret
         state.memory[0x200] = expected_sprite;
         state.display[30][0] = 0x1;
         state.display[31][0] = 0x1;
+        state.registers[0] = 0x1B;
+        state.registers[1] = 0x0;
 
-        actual.call(state, opcode);
+        actual.call(undefined, opcode, state);
 
         expect(state.display[29][0]).toBe(expected_off_pixel);
         expect(state.display[30][0]).toBe(expected_off_pixel);
@@ -378,7 +399,7 @@ define(["src/scripts/interpreter/operations", "src/scripts/interpreter/interpret
       it('should throw CodeNotRecognised error', function() {
         function actual() {
           return operations.getOps(opcode);
-        };
+        }
 
         expect(actual).toThrowError(CodeNotRecognised);
       });
@@ -398,8 +419,8 @@ define(["src/scripts/interpreter/operations", "src/scripts/interpreter/interpret
 
       it('should throw CodeNotRecognised', function() {
         var actual = function() {
-        return operations.getOps(opcode);
-      };
+          return operations.getOps(opcode);
+        };
 
         expect(actual).toThrowError(CodeNotRecognised);
       });
@@ -410,8 +431,8 @@ define(["src/scripts/interpreter/operations", "src/scripts/interpreter/interpret
 
       it('should throw CodeNotRecognised', function() {
         var actual = function() {
-        return operations.getOps(opcode);
-      };
+          return operations.getOps(opcode);
+        };
 
         expect(actual).toThrowError(CodeNotRecognised);
       });
@@ -422,8 +443,8 @@ define(["src/scripts/interpreter/operations", "src/scripts/interpreter/interpret
 
       it('should throw CodeNotRecognised', function() {
         var actual = function() {
-        return operations.getOps(opcode);
-      };
+          return operations.getOps(opcode);
+        };
 
         expect(actual).toThrowError(CodeNotRecognised);
       });

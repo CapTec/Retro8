@@ -1,4 +1,8 @@
-define(["src/scripts/interpreter/reg0", "src/scripts/interpreter/errors/notimplemented"], function(reg0, CodeNotImplemented) {
+define(function(require) {
+  var reg0 = require('src/scripts/interpreter/reg0'),
+    CodeNotImplemented = require('src/scripts/interpreter/errors/notimplemented'),
+    Interpreter = require('src/scripts/interpreter/interpreter');
+
   describe('reg0', function() {
     describe('getOps(0NNN)', function() {
       var opcode = 0x02EE;
@@ -30,21 +34,13 @@ define(["src/scripts/interpreter/reg0", "src/scripts/interpreter/errors/notimple
       });
 
       it('should call clearDisplay and set all pixels to "off" (0) and inc pc + 2', function() {
-        var display = new Array(64);
-
-        for (var i = 0; i < 64; i++) {
-          display[i] = new Array(32);
-          for (var j = 0; j < 32; j++) {
-            display[i][j] = 1;
-          }
-        }
         var state = {
-          display: display,
+          display: Interpreter.prototype.initDisplay(64, 32),
           program_counter: 0
         };
         var expected_pc = 2;
 
-        actual.call(state, opcode);
+        actual.call(undefined, opcode, state);
         expect(state.display[0][0]).toBe(0); // top left
         expect(state.display[63][0]).toBe(0); // top right
         expect(state.display[0][31]).toBe(0); // bottom left
@@ -68,12 +64,12 @@ define(["src/scripts/interpreter/reg0", "src/scripts/interpreter/errors/notimple
           program_counter: 0x400,
           stack: [0x200, 0x300],
           stack_pointer: 1
-        }
+        };
 
         var expected_pc = 0x300;
         var expected_sp = 0;
 
-        actual.call(state, opcode);
+        actual.call(undefined, opcode, state);
         expect(state.program_counter).toBe(expected_pc);
         expect(state.stack_pointer).toEqual(expected_sp);
       });

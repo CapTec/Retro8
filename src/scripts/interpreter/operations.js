@@ -20,19 +20,19 @@ define(['./reg0', './reg8', './rege', './regf', './errors/notrecognised'], funct
     0xF000: regF.getOps
   };
 
-  function getOps(opcode) {
+  function getOps(opcode, self) {
     var op = null;
 
-    if(typeof opcode !== 'number') {
+    if (typeof opcode !== 'number') {
       throw new CodeNotRecognised(opcode);
     } else if (operations[(opcode & 0xF000)] === reg0.getOps) {
-      op = reg0.getOps(opcode);
+      op = reg0.getOps(opcode, self);
     } else if (operations[(opcode & 0xF000)] === reg8.getOps) {
-      op = reg8.getOps(opcode);
+      op = reg8.getOps(opcode, self);
     } else if (operations[(opcode & 0xF000)] === regE.getOps) {
-      op = regE.getOps(opcode);
+      op = regE.getOps(opcode, self);
     } else if (operations[(opcode & 0xF000)] === regF.getOps) {
-      op = regF.getOps(opcode);
+      op = regF.getOps(opcode, self);
     } else {
       op = operations[(opcode & 0xF000)];
     }
@@ -51,10 +51,10 @@ define(['./reg0', './reg8', './rege', './regf', './errors/notrecognised'], funct
    * opcode: 1NNN
    * @param {UInt8} opcode - 8 bit opcode value
    */
-  function jump(opcode) {
+  function jump(opcode, self) {
     var nnn = opcode & 0x0FFF;
 
-    this.program_counter = nnn;
+    self.program_counter = nnn;
   }
 
   /*
@@ -64,12 +64,12 @@ define(['./reg0', './reg8', './rege', './regf', './errors/notrecognised'], funct
    * opcode: 2NNN
    * @param {UInt8} opcode - 8 bit opcode value
    */
-  function gosub(opcode) {
+  function gosub(opcode, self) {
     var nnn = opcode & 0x0FFF;
 
-    this.stack_pointer += 1;
-    this.stack.push(this.program_counter);
-    this.program_counter = nnn;
+    self.stack_pointer += 1;
+    self.stack.push(self.program_counter);
+    self.program_counter = nnn;
   }
 
   /*
@@ -80,14 +80,14 @@ define(['./reg0', './reg8', './rege', './regf', './errors/notrecognised'], funct
    * opcode: 3XNN
    * @param {UInt8} opcode - 8 bit opcode value
    */
-  function skipIfVxEqNN(opcode) {
+  function skipIfVxEqNN(opcode, self) {
     var vx = (opcode & 0x0F00) >> 8,
       nn = opcode & 0x00FF;
 
-    if (this.registers[vx] === nn) {
-      this.program_counter += 2;
+    if (self.registers[vx] === nn) {
+      self.program_counter += 2;
     }
-    this.program_counter += 2;
+    self.program_counter += 2;
   }
 
   /*
@@ -98,14 +98,14 @@ define(['./reg0', './reg8', './rege', './regf', './errors/notrecognised'], funct
    * opcode: 4XNN
    * @param {UInt8} opcode - 8 bit opcode value
    */
-  function skipIfVxNotEqNN(opcode) {
+  function skipIfVxNotEqNN(opcode, self) {
     var vx = (opcode & 0x0F00) >> 8,
       nn = opcode & 0x00FF;
 
-    if (this.registers[vx] !== nn) {
-      this.program_counter += 2;
+    if (self.registers[vx] !== nn) {
+      self.program_counter += 2;
     }
-    this.program_counter += 2;
+    self.program_counter += 2;
   }
 
   /*
@@ -116,14 +116,14 @@ define(['./reg0', './reg8', './rege', './regf', './errors/notrecognised'], funct
    * opcode: 5XY0
    * @param {UInt8} opcode - 8 bit opcode value
    */
-  function skipIfVxEqVy(opcode) {
+  function skipIfVxEqVy(opcode, self) {
     var vx = (opcode & 0x0F00) >> 8,
       vy = (opcode & 0x00F0) >> 4;
 
-    if (this.registers[vx] === this.registers[vy]) {
-      this.program_counter += 2;
+    if (self.registers[vx] === self.registers[vy]) {
+      self.program_counter += 2;
     }
-    this.program_counter += 2;
+    self.program_counter += 2;
   }
 
   /*
@@ -133,12 +133,12 @@ define(['./reg0', './reg8', './rege', './regf', './errors/notrecognised'], funct
    * opcode: 6XNN
    * @param {UInt8} opcode - 8 bit opcode value
    */
-  function setVxToNn(opcode) {
+  function setVxToNn(opcode, self) {
     var vx = (opcode & 0x0F00) >> 8,
       nn = opcode & 0x00FF;
 
-    this.registers[vx] = nn;
-    this.program_counter += 2;
+    self.registers[vx] = nn;
+    self.program_counter += 2;
   }
 
   /*
@@ -148,12 +148,12 @@ define(['./reg0', './reg8', './rege', './regf', './errors/notrecognised'], funct
    * opcode: 7XNN
    * @param {UInt8} opcode - 8 bit opcode value
    */
-  function addNnToVx(opcode) {
+  function addNnToVx(opcode, self) {
     var vx = (opcode & 0x0F00) >> 8,
       nn = opcode & 0x00FF;
 
-    this.registers[vx] += nn;
-    this.program_counter += 2;
+    self.registers[vx] += nn;
+    self.program_counter += 2;
   }
 
   /*
@@ -164,15 +164,15 @@ define(['./reg0', './reg8', './rege', './regf', './errors/notrecognised'], funct
    * opcode: 9XY0
    * @param {UInt8} opcode - 8 bit opcode value
    */
-  function skipIfVxNotVy(opcode) {
+  function skipIfVxNotVy(opcode, self) {
     var vx = (opcode & 0x0F00) >> 8,
       vy = (opcode & 0x00F0) >> 4;
 
-      this.program_counter += 2;
+    self.program_counter += 2;
 
-      if(this.registers[vx] !== this.registers[vy]) {
-        this.program_counter += 2;
-      }
+    if (self.registers[vx] !== self.registers[vy]) {
+      self.program_counter += 2;
+    }
   }
 
   /*
@@ -182,11 +182,11 @@ define(['./reg0', './reg8', './rege', './regf', './errors/notrecognised'], funct
    * opcode: ANNN
    * @param {UInt8} opcode - 8 bit opcode value
    */
-  function setIndexToAddr(opcode) {
+  function setIndexToAddr(opcode, self) {
     var nnn = opcode & 0x0FFF;
 
-    this.index_register = nnn;
-    this.program_counter += 2;
+    self.index_register = nnn;
+    self.program_counter += 2;
   }
 
   /*
@@ -196,11 +196,11 @@ define(['./reg0', './reg8', './rege', './regf', './errors/notrecognised'], funct
    * opcode: BNNN
    * @param {UInt8} opcode - 8 bit opcode value
    */
-  function jmpToAddrPlsV0(opcode) {
-    var v0 = this.registers[0];
+  function jmpToAddrPlsV0(opcode, self) {
+    var v0 = self.registers[0];
     var nnn = (opcode & 0x0FFF);
 
-    this.program_counter = nnn + v0;
+    self.program_counter = nnn + v0;
   }
 
   /*
@@ -211,12 +211,12 @@ define(['./reg0', './reg8', './rege', './regf', './errors/notrecognised'], funct
    * opcode: CXNN
    * @param {UInt8} opcode - 8 bit opcode value
    */
-  function bitSetVxRandAndV0(opcode) {
+  function bitSetVxRandAndV0(opcode, self) {
     var vx = (opcode & 0x0F00) >> 8;
     var nn = (opcode & 0x00FF);
 
-    this.registers[vx] = Math.floor(Math.random() * 256) & nn;
-    this.program_counter += 2;
+    self.registers[vx] = Math.floor(Math.random() * 256) & nn;
+    self.program_counter += 2;
   }
 
   /*
@@ -230,33 +230,33 @@ define(['./reg0', './reg8', './rege', './regf', './errors/notrecognised'], funct
    * opcode: DXYN
    * @param {UInt8} opcode - 8 bit opcode value
    */
-  function draw(opcode) {
+  function draw(opcode, self) {
     var vx = (opcode & 0x0F00) >> 8;
     var vy = (opcode & 0x00F0) >> 4;
     var height = (opcode & 0x000F);
 
-    var coordx = this.registers[vx];
-    var coordy = this.registers[vy];
+    var coordx = self.registers[vx];
+    var coordy = self.registers[vy];
 
-    this.registers[0xF] = 0x0;
+    self.registers[0xF] = 0x0;
 
-    for(var y = 0; y < height; y++) {
-      var sprite_byte = this.memory[this.index_register + y];
+    for (var y = 0; y < height; y++) {
+      var sprite_byte = self.memory[self.index_register + y];
 
-      for(var x = 0; x < 8; x++) {
+      for (var x = 0; x < 8; x++) {
         var bit = sprite_byte & (0x80 >> x);
 
-        if(bit !== 0x0) {
-          if(this.display[coordx + x][coordy + y] === 0x1) {
-            this.registers[0xF] = 1;
+        if (bit !== 0x0) {
+          if (self.display[coordx + x][coordy + y] === 0x1) {
+            self.registers[0xF] = 1;
           }
 
-          this.display[coordx + x][coordy + y] ^= 0x1;
+          self.display[coordx + x][coordy + y] ^= 0x1;
         }
       }
     }
 
-    this.program_counter += 2;
+    self.program_counter += 2;
   }
 
   return {

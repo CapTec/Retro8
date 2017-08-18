@@ -1,5 +1,6 @@
 define(function() {
   'use strict';
+
   function CodeNotRecognised(opcode) {
     this.name = 'CodeNotRecognised';
     this.message = 'The opcode 0x' + opcode.toString(16).toUpperCase() + ' is not recognised.';

@@ -1,16 +1,25 @@
-define(['./operations', './font'], function(operations, font) {
+define(function(require) {
   'use strict';
 
-  var memoryLimit = 4096,
+  var operations = require('./operations'),
+    font = require('./font'),
+    keyboard = require('./keyboard'),
+    memoryLimit = 4096,
     registerCount = 16,
     width = 64,
-    height = 32;
+    height = 32,
+    stackSize = 16,
+    reset,
+    cycle,
+    loadFont,
+    handleTimers;
 
   function Interpreter() {
     this.registers = initRegisters();
     this.memory = initMemory();
     this.display = initDisplay(width, height);
     this.keyboard = initKeyboard();
+    this.stack = initStack();
   }
 
   Interpreter.prototype = {
@@ -24,14 +33,14 @@ define(['./operations', './font'], function(operations, font) {
     initMemory: initMemory,
     initRegisters: initRegisters,
     initKeyboard: initKeyboard,
-    stack: [],
+    initStack: initStack,
     delayTimer: 0,
     soundTimer: 0
   };
 
-  function reset() {
+  reset = function reset() {
     this.program_counter = 0x200;
-    this.stack = [];
+    this.stack = initStack();
     this.index_register = 0;
     this.registers = initRegisters();
     this.memory = initMemory();
@@ -39,6 +48,10 @@ define(['./operations', './font'], function(operations, font) {
     this.keyboard = initKeyboard();
     this.delayTimer = 0;
     this.soundTimer = 0;
+  };
+
+  function initStack() {
+    return new Uint16Array(stackSize);
   }
 
   function initRegisters() {
@@ -46,7 +59,7 @@ define(['./operations', './font'], function(operations, font) {
   }
 
   function initMemory() {
-    return new Uint8Array(memoryLimit)
+    return new Uint8Array(memoryLimit);
   }
 
   function initDisplay(w, h) {
@@ -61,11 +74,12 @@ define(['./operations', './font'], function(operations, font) {
     return display;
   }
 
-  function cycle() {
-    var opcode = this.memory[this.program_counter] << 8; // fetch
+  cycle = function cycle() {
+    var opcode = this.memory[this.program_counter] << 8,
+      op;
 
     try {
-      var op = operations.getOps(opcode); // decode
+      op = operations.getOps(opcode); // decode
     } catch (err) {
       // error occurred decoding the current opcode.
     }
@@ -77,12 +91,12 @@ define(['./operations', './font'], function(operations, font) {
     }
 
     handleTimers.call(this);
-  }
+  };
 
   /*
    * Decrements Chip8 timers if > 0
    */
-  function handleTimers() {
+  handleTimers = function handleTimers() {
     if (this.delayTimer > 0)
       this.delayTimer -= 1;
 
@@ -92,38 +106,21 @@ define(['./operations', './font'], function(operations, font) {
       }
       this.soundTimer -= 1;
     }
-  }
+  };
 
   /*
    * Fonts are loaded into the reserved intepreter memory
    * space (0x000 to 0x1FF)
    */
-  function loadFont() {
+  loadFont = function loadFont() {
     var length = font.length;
     for (var i = 0; i < length; i++) {
       this.memory[i] = font[i];
     }
-  }
+  };
 
   function initKeyboard() {
-    return {
-      0x1: 0,
-      0x2: 0,
-      0x3: 0,
-      0xC: 0,
-      0x4: 0,
-      0x5: 0,
-      0x6: 0,
-      0xD: 0,
-      0x7: 0,
-      0x8: 0,
-      0x9: 0,
-      0xE: 0,
-      0xA: 0,
-      0x0: 0,
-      0xB: 0,
-      0xF: 0
-    };
+    return keyboard.keys();
   }
 
   return Interpreter;

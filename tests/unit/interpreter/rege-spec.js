@@ -1,4 +1,7 @@
-define(["src/scripts/interpreter/rege"], function(rege) {
+define(function(require) {
+  var rege = require('src/scripts/interpreter/rege'),
+    Interpreter = require('src/scripts/interpreter/interpreter');
+
   describe('rege', function() {
     describe('getOps(0xEX9E)', function() {
       var opcode = 0xE09E;
@@ -12,15 +15,16 @@ define(["src/scripts/interpreter/rege"], function(rege) {
 
       it('increments program_counter by 4 if vx is pressed', function() {
         var state = {
-          registers: [0xA],
+          registers: Interpreter.prototype.initRegisters(),
           program_counter: 0,
           keyboard: {
             0xA: 1
           } // A key pressed
         };
+        state.registers[0] = 0XA;
         var expected_pc = 4;
 
-        actual.call(state, opcode);
+        actual.call(undefined, opcode, state);
 
         expect(state.program_counter).toBe(expected_pc);
       });
@@ -38,15 +42,16 @@ define(["src/scripts/interpreter/rege"], function(rege) {
 
       it('increments program_counter by 4 if vx is not pressed', function() {
         var state = {
-          registers: [0xA],
+          registers: Interpreter.prototype.initRegisters(),
           program_counter: 0,
           keyboard: {
             0xA: 0
           } // A key not pressed
         };
+        state.registers[0] = 0xA;
         var expected_pc = 4;
 
-        actual.call(state, opcode);
+        actual.call(undefined, opcode, state);
 
         expect(state.program_counter).toBe(expected_pc);
       });

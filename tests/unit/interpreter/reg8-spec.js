@@ -1,4 +1,7 @@
-define(["src/scripts/interpreter/reg8"], function(reg8) {
+define(function(require) {
+  var Interpreter = require('src/scripts/interpreter/interpreter'),
+    reg8 = require('src/scripts/interpreter/reg8');
+
   describe('reg8', function() {
     describe('getOps(8XY0)', function() {
       var opcode = 0x8010;
@@ -12,14 +15,15 @@ define(["src/scripts/interpreter/reg8"], function(reg8) {
 
       it('should set Vx to value of Vy', function() {
         var state = {
-          registers: [0x02, 0xFF],
+          registers: Interpreter.prototype.initRegisters(),
           program_counter: 0
         };
-
+        state.registers[0] = 0x02;
+        state.registers[1] = 0xFF;
         var expected_vx = 0xFF;
         var expected_pc = 2;
 
-        actual.call(state, opcode);
+        actual.call(undefined, opcode, state);
         expect(state.registers[0]).toBe(expected_vx);
         expect(state.program_counter).toBe(expected_pc);
       });
@@ -37,28 +41,30 @@ define(["src/scripts/interpreter/reg8"], function(reg8) {
 
       it('should set Vx to Vx bitwise OR Vy', function() {
         var state = {
-          registers: [0x0, 0x0],
+          registers: Interpreter.prototype.initRegisters(),
           program_counter: 0
         };
+        state.registers[0] = 0x0;
+        state.registers[1] = 0x0;
 
         var expected_vx = 0x0;
         var expected_pc = 2;
 
-        actual.call(state, opcode);
+        actual.call(undefined, opcode, state);
         expect(state.registers[0]).toBe(expected_vx);
         expect(state.program_counter).toBe(expected_pc);
 
         expected_vx = 0x1;
         state.registers = [0x0, 0x1];
-        actual.call(state, opcode);
+        actual.call(undefined, opcode, state);
         expect(state.registers[0]).toBe(expected_vx);
 
         state.registers = [0x1, 0x0];
-        actual.call(state, opcode);
+        actual.call(undefined, opcode, state);
         expect(state.registers[0]).toBe(expected_vx);
 
         state.registers = [0x1, 0x1];
-        actual.call(state, opcode);
+        actual.call(undefined, opcode, state);
         expect(state.registers[0]).toBe(expected_vx);
       });
     });
@@ -75,29 +81,31 @@ define(["src/scripts/interpreter/reg8"], function(reg8) {
 
       it('should set Vx to Vx bitwise And Vy', function() {
         var state = {
-          registers: [0x0, 0x0],
+          registers: Interpreter.prototype.initRegisters(),
           program_counter: 0
         };
+        state.registers[0] = 0x0;
+        state.registers[1] = 0x0;
 
         var expected_vx = 0x0;
         var expected_pc = 2;
 
-        actual.call(state, opcode);
+        actual.call(undefined, opcode, state);
         expect(state.registers[0]).toBe(expected_vx);
         expect(state.program_counter).toBe(expected_pc);
 
         state.registers = [0x0, 0x1];
-        actual.call(state, opcode);
+        actual.call(undefined, opcode, state);
         expect(state.registers[0]).toBe(expected_vx);
 
         state.registers = [0x1, 0x0];
-        actual.call(state, opcode);
+        actual.call(undefined, opcode, state);
         expect(state.registers[0]).toBe(expected_vx);
 
-        var expected_vx = 0x1;
+        expected_vx = 0x1;
 
         state.registers = [0x1, 0x1];
-        actual.call(state, opcode);
+        actual.call(undefined, opcode, state);
         expect(state.registers[0]).toBe(expected_vx);
       });
     });
@@ -114,29 +122,30 @@ define(["src/scripts/interpreter/reg8"], function(reg8) {
 
       it('should set Vx to Vx bitwise XOR Vy', function() {
         var state = {
-          registers: [0x0, 0x0],
+          registers: Interpreter.prototype.initRegisters(),
           program_counter: 0
         };
-
+        state.registers[0] = 0x0;
+        state.registers[1] = 0x0;
         var expected_vx = 0x0;
         var expected_pc = 2;
 
-        actual.call(state, opcode);
+        actual.call(undefined, opcode, state);
         expect(state.registers[0]).toBe(expected_vx);
         expect(state.program_counter).toBe(expected_pc);
 
         state.registers = [0x1, 0x1];
-        actual.call(state, opcode);
+        actual.call(undefined, opcode, state);
         expect(state.registers[0]).toBe(expected_vx);
 
-        var expected_vx = 0x1;
+        expected_vx = 0x1;
 
         state.registers = [0x0, 0x1];
-        actual.call(state, opcode);
+        actual.call(undefined, opcode, state);
         expect(state.registers[0]).toBe(expected_vx);
 
         state.registers = [0x1, 0x0];
-        actual.call(state, opcode);
+        actual.call(undefined, opcode, state);
         expect(state.registers[0]).toBe(expected_vx);
       });
     });
@@ -153,15 +162,17 @@ define(["src/scripts/interpreter/reg8"], function(reg8) {
 
       it('should set Vx to Vx + Vy and set Vf = 0', function() {
         var state = {
-          registers: [0x2, 0x2, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0],
+          registers: Interpreter.prototype.initRegisters(),
           program_counter: 0
         };
+        state.registers[0] = 0x2;
+        state.registers[1] = 0x2;
 
         var expected_vx = 0x4;
         var expected_pc = 2;
         var expected_vf = 0x0;
 
-        actual.call(state, opcode);
+        actual.call(undefined, opcode, state);
         expect(state.registers[0]).toBe(expected_vx);
         expect(state.program_counter).toBe(expected_pc);
         expect(state.registers[0xF]).toBe(expected_vf);
@@ -179,7 +190,7 @@ define(["src/scripts/interpreter/reg8"], function(reg8) {
         var expected_pc = 2;
         var expected_vf = 0x1;
 
-        actual.call(state, opcode);
+        actual.call(undefined, opcode, state);
         expect(state.registers[0]).toBe(expected_vx);
         expect(state.program_counter).toBe(expected_pc);
         expect(state.registers[0xF]).toBe(expected_vf);
@@ -197,7 +208,7 @@ define(["src/scripts/interpreter/reg8"], function(reg8) {
         var expected_pc = 2;
         var expected_vf = 0x0;
 
-        actual.call(state, opcode);
+        actual.call(undefined, opcode, state);
         expect(state.registers[0]).toBe(expected_vx);
         expect(state.program_counter).toBe(expected_pc);
         expect(state.registers[0xF]).toBe(expected_vf);
@@ -216,14 +227,16 @@ define(["src/scripts/interpreter/reg8"], function(reg8) {
 
       it('should set Vx to Vx - Vy', function() {
         var state = {
-          registers: [0x8, 0x2],
+          registers: Interpreter.prototype.initRegisters(),
           program_counter: 0
         };
+        state.registers[0] = 0x8;
+        state.registers[1] = 0x2;
 
         var expected_vx = 0x6;
         var expected_pc = 2;
 
-        actual.call(state, opcode);
+        actual.call(undefined, opcode, state);
         expect(state.registers[0]).toBe(expected_vx);
         expect(state.program_counter).toBe(expected_pc);
       });
@@ -241,15 +254,16 @@ define(["src/scripts/interpreter/reg8"], function(reg8) {
 
       it('Shift VX right by one. VF set to lsb of VX before the shift.', function() {
         var state = {
-          registers: [0xFF, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0],
+          registers: Interpreter.prototype.initRegisters(),
           program_counter: 0
         };
+        state.registers[0] = 0xFF;
 
         var expected_vx = 0x7F;
         var expected_vf = 0x1;
         var expected_pc = 2;
 
-        actual.call(state, opcode);
+        actual.call(undefined, opcode, state);
         expect(state.registers[0]).toBe(expected_vx);
         expect(state.registers[0xF]).toBe(expected_vf);
         expect(state.program_counter).toBe(expected_pc);
@@ -268,13 +282,15 @@ define(["src/scripts/interpreter/reg8"], function(reg8) {
 
       it('should set Vx to Vy - Vx and increment program counter by 2', function() {
         var state = {
-          registers: [0x01, 0xFF, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0],
+          registers: Interpreter.prototype.initRegisters(),
           program_counter: 0
         };
+        state.registers[0] = 0x01;
+        state.registers[1] = 0xFF;
         var expected_vx = 0xFE;
         var expected_pc = 2;
 
-        actual.call(state, opcode);
+        actual.call(undefined, opcode, state);
         expect(state.registers[0]).toBe(expected_vx);
         expect(state.program_counter).toBe(expected_pc);
       });
@@ -292,13 +308,14 @@ define(["src/scripts/interpreter/reg8"], function(reg8) {
 
       it('should shift Vx left by one bit and increment program counter + 2', function() {
         var state = {
-          registers: [0x0B, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0],
+          registers: Interpreter.prototype.initRegisters(),
           program_counter: 0
         };
+        state.registers[0] = 0x0B;
         var expected_vx = 0x16;
         var expected_pc = 2;
 
-        actual.call(state, opcode);
+        actual.call(undefined, opcode, state);
         expect(state.registers[0]).toBe(expected_vx);
         expect(state.program_counter).toBe(expected_pc);
       });

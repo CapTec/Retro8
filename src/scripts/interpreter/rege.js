@@ -6,7 +6,7 @@ define(function() {
     0x00A1: skipIfVxNotPressed
   };
 
-  function getOps(opcode) {
+  function getOps(opcode, self) {
     return operations[(opcode & 0x00FF)];
   }
 
@@ -17,15 +17,15 @@ define(function() {
    * operator type: Keyboard
    * @param {UInt8} opcode - 8 bit opcode value
    */
-  function skipIfVxPressed(opcode) {
+  function skipIfVxPressed(opcode, self) {
     var vx = (opcode & 0x0F00) >> 8;
-    var key = this.registers[vx];
+    var key = self.registers[vx];
 
-    if(this.keyboard[key] === 0x1) {
-      this.program_counter += 2;
+    if (self.keyboard[key] === 0x1) {
+      self.program_counter += 2;
     }
 
-    this.program_counter += 2;
+    self.program_counter += 2;
   }
 
   /*
@@ -35,15 +35,15 @@ define(function() {
    * operator type: Keyboard
    * @param {UInt8} opcode - 8 bit opcode value
    */
-  function skipIfVxNotPressed(opcode) {
+  function skipIfVxNotPressed(opcode, self) {
     var vx = (opcode & 0x0F00) >> 8;
-    var key = this.registers[vx];
+    var key = self.registers[vx];
 
-    if(this.keyboard[key] === 0x0) {
-      this.program_counter += 2;
+    if (self.keyboard[key] === 0x0) {
+      self.program_counter += 2;
     }
 
-    this.program_counter += 2;
+    self.program_counter += 2;
   }
 
   return {

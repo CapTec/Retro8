@@ -13,7 +13,7 @@ define(function() {
     0x0065: regLoad
   };
 
-  function getOps(opcode) {
+  function getOps(opcode, self) {
     return operations[(opcode & 0x00FF)];
   }
 
@@ -24,11 +24,11 @@ define(function() {
    * opcode: FX07
    * @param {UInt8} opcode - 8 bit opcode value
    */
-  function setVxToDelay(opcode) {
+  function setVxToDelay(opcode, self) {
     var vx = (opcode & 0x0F00) >> 8;
-    this.registers[vx] = this.delayTimer;
+    self.registers[vx] = self.delayTimer;
 
-    this.program_counter += 2;
+    self.program_counter += 2;
   }
 
   /*
@@ -39,12 +39,12 @@ define(function() {
    * opcode: FX0A
    * @param {UInt8} opcode - 8 bit opcode value
    */
-  function setVxToKey(opcode) {
+  function setVxToKey(opcode, self) {
     var pressed = false;
     var key = null;
 
-    for (var prop in this.keyboard) {
-      if (this.keyboard[prop] !== 1)
+    for (var prop in self.keyboard) {
+      if (self.keyboard[prop] !== 1)
         continue;
       pressed = true;
       key = prop;
@@ -56,8 +56,8 @@ define(function() {
 
     var vx = (opcode & 0x0F00) >> 8;
     key = typeof key === 'string' ? parseInt(key, 10) : key;
-    this.registers[vx] = key;
-    this.program_counter += 2;
+    self.registers[vx] = key;
+    self.program_counter += 2;
   }
 
   /*
@@ -67,11 +67,11 @@ define(function() {
    * opcode: FX15
    * @param {UInt8} opcode - 8 bit opcode value
    */
-  function setDelayTimer(opcode) {
+  function setDelayTimer(opcode, self) {
     var vx = (opcode & 0x0F00) >> 8;
-    this.delayTimer = this.registers[vx];
+    self.delayTimer = self.registers[vx];
 
-    this.program_counter += 2;
+    self.program_counter += 2;
   }
 
   /*
@@ -81,11 +81,11 @@ define(function() {
    * opcode: FX18
    * @param {UInt8} opcode - 8 bit opcode value
    */
-  function setSoundTimer(opcode) {
+  function setSoundTimer(opcode, self) {
     var vx = (opcode & 0x0F00) >> 8;
-    this.soundTimer = this.registers[vx];
+    self.soundTimer = self.registers[vx];
 
-    this.program_counter += 2;
+    self.program_counter += 2;
   }
 
   /*
@@ -95,11 +95,11 @@ define(function() {
    * opcode: FX1E
    * @param {UInt8} opcode - 8 bit opcode value
    */
-  function addVxToIdxReg(opcode) {
+  function addVxToIdxReg(opcode, self) {
     var vx = (opcode & 0x0F00) >> 8;
-    this.index_register += this.registers[vx];
+    self.index_register += self.registers[vx];
 
-    this.program_counter += 2;
+    self.program_counter += 2;
   }
 
   /*
@@ -110,11 +110,11 @@ define(function() {
    * opcode: FX29
    * @param {UInt8} opcode - 8 bit opcode value
    */
-  function setIdxToSprite(opcode) {
+  function setIdxToSprite(opcode, self) {
     var vx = (opcode & 0x0F00) >> 8;
-    this.index_register = this.registers[vx] * 5;
+    self.index_register = self.registers[vx] * 5;
 
-    this.program_counter += 2;
+    self.program_counter += 2;
   }
 
   /*
@@ -132,15 +132,15 @@ define(function() {
    * opcode: FX33
    * @param {UInt8} opcode - 8 bit opcode value
    */
-  function setBcd(opcode) {
-    var vx = this.registers[(opcode & 0x0F00)];
+  function setBcd(opcode, self) {
+    var vx = self.registers[(opcode & 0x0F00)];
 
     for (var i = 3; i > 0; i--) { // i is set to the decimal number size
-      this.memory[this.index_register + i - 1] = parseInt(vx % 10); // we modulo by 10 to get the BCD
+      self.memory[self.index_register + i - 1] = parseInt(vx % 10); // we modulo by 10 to get the BCD
       vx = Math.floor(vx / 10); // reduces the decimal number to its next lowest unit
     }
 
-    this.program_counter += 2;
+    self.program_counter += 2;
   }
 
   /*
@@ -150,13 +150,13 @@ define(function() {
    * opcode: FX55
    * @param {UInt8} opcode - 8 bit opcode value
    */
-  function regDump(opcode) {
+  function regDump(opcode, self) {
     var vx = (opcode & 0x0F00) >> 8;
     for (var i = 0; i <= vx; i++) {
-      this.memory[this.index_register + i] = this.registers[i];
+      self.memory[self.index_register + i] = self.registers[i];
     }
 
-    this.program_counter += 2;
+    self.program_counter += 2;
   }
 
   /*
@@ -166,13 +166,13 @@ define(function() {
    * opcode: FX65
    * @param {UInt8} opcode - 8 bit opcode value
    */
-  function regLoad(opcode) {
+  function regLoad(opcode, self) {
     var vx = (opcode & 0x0F00) >> 8;
     for (var i = 0; i <= vx; i++) {
-      this.registers[i] = this.memory[this.index_register + i];
+      self.registers[i] = self.memory[self.index_register + i];
     }
 
-    this.program_counter += 2;
+    self.program_counter += 2;
   }
 
   return {

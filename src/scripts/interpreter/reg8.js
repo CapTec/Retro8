@@ -13,7 +13,7 @@ define(function() {
     0x000E: shiftVxLeft
   };
 
-  function getOps(opcode) {
+  function getOps(opcode, self) {
     return operations[(opcode & 0x000F)];
   }
 
@@ -24,12 +24,12 @@ define(function() {
    * opcode: 0x8XY0
    * @param {UInt8} opcode - 8 bit opcode value
    */
-  function setVxToVy(opcode) {
+  function setVxToVy(opcode, self) {
     var vx = (opcode & 0x0F00) >> 8,
       vy = (opcode & 0x00F0) >> 4;
 
-    this.registers[vx] = this.registers[vy]
-    this.program_counter += 2;
+    self.registers[vx] = self.registers[vy];
+    self.program_counter += 2;
   }
 
   /*
@@ -39,12 +39,12 @@ define(function() {
    * opcode: 8XY1
    * @param {UInt8} opcode - 8 bit opcode value
    */
-  function setVxToVxOrVy(opcode) {
+  function setVxToVxOrVy(opcode, self) {
     var vx = (opcode & 0x0F00) >> 8,
       vy = (opcode & 0x00F0) >> 4;
 
-    this.registers[vx] = this.registers[vx] | this.registers[vy];
-    this.program_counter += 2;
+    self.registers[vx] = self.registers[vx] | self.registers[vy];
+    self.program_counter += 2;
   }
 
   /*
@@ -54,12 +54,12 @@ define(function() {
    * opcode: 8XY2
    * @param {UInt8} opcode - 8 bit opcode value
    */
-  function setVxToVxAndVy(opcode) {
+  function setVxToVxAndVy(opcode, self) {
     var vx = (opcode & 0x0F00) >> 8,
       vy = (opcode & 0x00F0) >> 4;
 
-    this.registers[vx] = this.registers[vx] & this.registers[vy];
-    this.program_counter += 2;
+    self.registers[vx] = self.registers[vx] & self.registers[vy];
+    self.program_counter += 2;
   }
 
   /*
@@ -69,12 +69,12 @@ define(function() {
    * opcode: 8XY3
    * @param {UInt8} opcode - 8 bit opcode value
    */
-  function setVxToVxXorVy(opcode) {
+  function setVxToVxXorVy(opcode, self) {
     var vx = (opcode & 0x0F00) >> 8,
       vy = (opcode & 0x00F0) >> 4;
 
-    this.registers[vx] = this.registers[vx] ^ this.registers[vy];
-    this.program_counter += 2;
+    self.registers[vx] = self.registers[vx] ^ self.registers[vy];
+    self.program_counter += 2;
   }
 
   /*
@@ -84,18 +84,18 @@ define(function() {
    * opcode: 8XY4
    * @param {UInt8} opcode - 8 bit opcode value
    */
-  function setVxToVxPlusVy(opcode) {
+  function setVxToVxPlusVy(opcode, self) {
     var vx = (opcode & 0x0F00) >> 8,
       vy = (opcode & 0x00F0) >> 4;
 
-    this.registers[vx] += this.registers[vy];
-    if (this.registers[vy] > 0xFF - this.registers[vx]) {
-      this.registers[0xF] = 1;
+    self.registers[vx] += self.registers[vy];
+    if (self.registers[vy] > 0xFF - self.registers[vx]) {
+      self.registers[0xF] = 1;
     } else {
-      this.registers[0xF] = 0;
+      self.registers[0xF] = 0;
     }
 
-    this.program_counter += 2;
+    self.program_counter += 2;
   }
 
   /*
@@ -105,18 +105,18 @@ define(function() {
    * opcode: 8XY5
    * @param {UInt8} opcode - 8 bit opcode value
    */
-  function setVxToVxMinusVy(opcode) {
+  function setVxToVxMinusVy(opcode, self) {
     var vx = (opcode & 0x0F00) >> 8,
       vy = (opcode & 0x00F0) >> 4;
 
-    if (this.registers[vx] > this.registers[vy]) {
-      this.registers[0xF] = 1;
+    if (self.registers[vx] > self.registers[vy]) {
+      self.registers[0xF] = 1;
     } else {
-      this.registers[0xF] = 0;
+      self.registers[0xF] = 0;
     }
 
-    this.registers[vx] -= this.registers[vy];
-    this.program_counter += 2;
+    self.registers[vx] -= self.registers[vy];
+    self.program_counter += 2;
   }
 
   /*
@@ -126,13 +126,13 @@ define(function() {
    * opcode: 8XY6
    * @param {UInt8} opcode - 8 bit opcode value
    */
-  function shiftVxRight(opcode) {
+  function shiftVxRight(opcode, self) {
     var vx = (opcode & 0x0F00) >> 8;
-    var lsb = this.registers[vx] & 0x01;
+    var lsb = self.registers[vx] & 0x01;
 
-    this.registers[0xF] = lsb;
-    this.registers[vx] = this.registers[vx] >> 1;
-    this.program_counter += 2;
+    self.registers[0xF] = lsb;
+    self.registers[vx] = self.registers[vx] >> 1;
+    self.program_counter += 2;
   }
 
   /*
@@ -142,18 +142,18 @@ define(function() {
    * opcode: 8XY7
    * @param {UInt8} opcode - 8 bit opcode value
    */
-  function setVxEqVyMinusVx(opcode) {
+  function setVxEqVyMinusVx(opcode, self) {
     var vx = (opcode & 0x0F00) >> 8,
       vy = (opcode & 0x00F0) >> 4;
 
-    if (this.registers[vx] > this.registers[vy]) {
-      this.registers[0xF] = 0;
+    if (self.registers[vx] > self.registers[vy]) {
+      self.registers[0xF] = 0;
     } else {
-      this.registers[0xF] = 1;
+      self.registers[0xF] = 1;
     }
 
-    this.registers[vx] = this.registers[vy] - this.registers[vx];
-    this.program_counter += 2;
+    self.registers[vx] = self.registers[vy] - self.registers[vx];
+    self.program_counter += 2;
   }
 
   /*
@@ -163,13 +163,13 @@ define(function() {
    * opcode: 8XYE
    * @param {UInt8} opcode - 8 bit opcode value
    */
-  function shiftVxLeft(opcode) {
+  function shiftVxLeft(opcode, self) {
     var vx = (opcode & 0x0F00) >> 8;
-    var msb = this.registers[vx] & 0x80;
+    var msb = self.registers[vx] & 0x80;
 
-    this.registers[0xF] = msb;
-    this.registers[vx] = this.registers[vx] << 1;
-    this.program_counter += 2;
+    self.registers[0xF] = msb;
+    self.registers[vx] = self.registers[vx] << 1;
+    self.program_counter += 2;
   }
 
   return {
