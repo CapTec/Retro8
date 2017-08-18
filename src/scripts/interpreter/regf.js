@@ -96,8 +96,10 @@ define(['./errors/notimplemented'], function(CodeNotImplemented) {
    * @param {UInt8} opcode - 8 bit opcode value
    */
   function addVxToIdxReg(opcode) {
+    var vx = (opcode & 0x0F00) >> 8;
+    this.index_register += this.registers[vx];
+
     this.program_counter += 2;
-    throw new CodeNotImplemented(opcode);
   }
 
   /*
