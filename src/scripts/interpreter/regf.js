@@ -103,7 +103,7 @@ define(['./errors/notimplemented'], function(CodeNotImplemented) {
   }
 
   /*
-   * Sets I to the location of the sprite for the character in VX.
+   * Sets I to the location of the sprite for the character in Vx.
    * Characters 0-F (in hexadecimal) are represented by a 4x5 font.
    * pseudo: I=sprite_addr[Vx]
    * operator type: Memory
@@ -111,8 +111,10 @@ define(['./errors/notimplemented'], function(CodeNotImplemented) {
    * @param {UInt8} opcode - 8 bit opcode value
    */
   function setIdxToSprite(opcode) {
+    var vx = (opcode & 0x0F00) >> 8;
+    this.index_register = this.registers[vx] * 5;
+
     this.program_counter += 2;
-    throw new CodeNotImplemented(opcode);
   }
 
   /*
