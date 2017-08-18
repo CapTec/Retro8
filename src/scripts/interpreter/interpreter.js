@@ -37,9 +37,7 @@ define(function(require) {
     initMemory: initMemory,
     initRegisters: initRegisters,
     initKeyboard: initKeyboard,
-    initStack: initStack,
-    delayTimer: 0,
-    soundTimer: 0
+    initStack: initStack
   };
 
   reset = function reset() {
@@ -52,6 +50,8 @@ define(function(require) {
     this.display = initDisplay(width, height);
     this.keyboard = initKeyboard();
     this.loadFont();
+    this.delayTimer = 0;
+    this.soundTimer = 0;
   };
 
   function initStack() {
