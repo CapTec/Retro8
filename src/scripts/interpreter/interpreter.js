@@ -15,6 +15,11 @@ define(function(require) {
     handleTimers;
 
   function Interpreter() {
+    this.program_counter = 0x200;
+    this.stack_pointer = 0;
+    this.index_register = 0;
+    this.delayTimer = 0;
+    this.soundTimer = 0;
     this.registers = initRegisters();
     this.memory = initMemory();
     this.display = initDisplay(width, height);
@@ -28,9 +33,6 @@ define(function(require) {
   }
 
   Interpreter.prototype = {
-    program_counter: 0x200,
-    stack_pointer: 0,
-    index_register: 0,
     initDisplay: initDisplay,
     initMemory: initMemory,
     initRegisters: initRegisters,
@@ -49,8 +51,6 @@ define(function(require) {
     this.memory = initMemory();
     this.display = initDisplay(width, height);
     this.keyboard = initKeyboard();
-    this.delayTimer = 0;
-    this.soundTimer = 0;
     this.loadFont();
   };
 
