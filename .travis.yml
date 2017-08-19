@@ -5,14 +5,3 @@ before_script:
   - 'npm install -g grunt-cli'
 after_success:
   - 'npm run coverage'
-cache:
-  directories:
-    - travis_phantomjs
-before_install:
-  # Upgrade PhantomJS to v2.1.12
-  - "export PHANTOMJS_VERSION=2.1.12"
-  - "export PATH=$PWD/travis_phantomjs/phantomjs-$PHANTOMJS_VERSION/bin:$PATH"
-  - "if [ $(phantomjs --version) != $PHANTOMJS_VERSION ]; then rm -rf $PWD/travis_phantomjs; mkdir -p $PWD/travis_phantomjs; fi"
-  - "if [ $(phantomjs --version) != $PHANTOMJS_VERSION ]; then wget https://github.com/Medium/phantomjs/archive/$PHANTOMJS_VERSION.tar.gz -O $PWD/travis_phantomjs/phantomjs-$PHANTOMJS_VERSION.tar.gz; fi"
-  - "if [ $(phantomjs --version) != $PHANTOMJS_VERSION ]; then tar -xvzf $PWD/travis_phantomjs/phantomjs-$PHANTOMJS_VERSION.tar.gz -C $PWD/travis_phantomjs; fi"
-  - "phantomjs --version"
