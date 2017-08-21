@@ -49,7 +49,7 @@ define(['./reg0', './reg8', './rege', './regf', './errors/notrecognised'], funct
    * pseudo: goto NNN
    * operator type: Flow
    * opcode: 1NNN
-   * @param {UInt8} opcode - 8 bit opcode value
+   * @param {UInt16} opcode - 16 bit operand word
    */
   function jump(opcode, self) {
     var nnn = opcode & 0x0FFF;
@@ -62,7 +62,7 @@ define(['./reg0', './reg8', './rege', './regf', './errors/notrecognised'], funct
    * pseudo: *(0xNNN)()
    * operator type: Flow
    * opcode: 2NNN
-   * @param {UInt8} opcode - 8 bit opcode value
+   * @param {UInt16} opcode - 16 bit operand word
    */
   function gosub(opcode, self) {
     var nnn = opcode & 0x0FFF;
@@ -78,7 +78,7 @@ define(['./reg0', './reg8', './rege', './regf', './errors/notrecognised'], funct
    * psuedo: if(Vx == NN)
    * operator type: conditional
    * opcode: 3XNN
-   * @param {UInt8} opcode - 8 bit opcode value
+   * @param {UInt16} opcode - 16 bit operand word
    */
   function skipIfVxEqNN(opcode, self) {
     var vx = (opcode & 0x0F00) >> 8,
@@ -96,7 +96,7 @@ define(['./reg0', './reg8', './rege', './regf', './errors/notrecognised'], funct
    * psuedo: if(Vx != NN)
    * operator type: conditional
    * opcode: 4XNN
-   * @param {UInt8} opcode - 8 bit opcode value
+   * @param {UInt16} opcode - 16 bit operand word
    */
   function skipIfVxNotEqNN(opcode, self) {
     var vx = (opcode & 0x0F00) >> 8,
@@ -114,7 +114,7 @@ define(['./reg0', './reg8', './rege', './regf', './errors/notrecognised'], funct
    * psuedo: if(Vx == Vy)
    * operator type: conditional
    * opcode: 5XY0
-   * @param {UInt8} opcode - 8 bit opcode value
+   * @param {UInt16} opcode - 16 bit operand word
    */
   function skipIfVxEqVy(opcode, self) {
     var vx = (opcode & 0x0F00) >> 8,
@@ -131,7 +131,7 @@ define(['./reg0', './reg8', './rege', './regf', './errors/notrecognised'], funct
    * psuedo: Vx = NN
    * operator type: constant
    * opcode: 6XNN
-   * @param {UInt8} opcode - 8 bit opcode value
+   * @param {UInt16} opcode - 16 bit operand word
    */
   function setVxToNn(opcode, self) {
     var vx = (opcode & 0x0F00) >> 8,
@@ -146,7 +146,7 @@ define(['./reg0', './reg8', './rege', './regf', './errors/notrecognised'], funct
    * psuedo: Vx += NN
    * operator type: constant
    * opcode: 7XNN
-   * @param {UInt8} opcode - 8 bit opcode value
+   * @param {UInt16} opcode - 16 bit operand word
    */
   function addNnToVx(opcode, self) {
     var vx = (opcode & 0x0F00) >> 8,
@@ -162,7 +162,7 @@ define(['./reg0', './reg8', './rege', './regf', './errors/notrecognised'], funct
    * psuedo: if(Vx!=Vy)
    * operator type: conditional
    * opcode: 9XY0
-   * @param {UInt8} opcode - 8 bit opcode value
+   * @param {UInt16} opcode - 16 bit operand word
    */
   function skipIfVxNotVy(opcode, self) {
     var vx = (opcode & 0x0F00) >> 8,
@@ -180,7 +180,7 @@ define(['./reg0', './reg8', './rege', './regf', './errors/notrecognised'], funct
    * psuedo: i = NNN
    * operator type: Memory
    * opcode: ANNN
-   * @param {UInt8} opcode - 8 bit opcode value
+   * @param {UInt16} opcode - 16 bit operand word
    */
   function setIndexToAddr(opcode, self) {
     var nnn = opcode & 0x0FFF;
@@ -194,7 +194,7 @@ define(['./reg0', './reg8', './rege', './regf', './errors/notrecognised'], funct
    * psuedo: PC=V0+NNN
    * operator type: Flow
    * opcode: BNNN
-   * @param {UInt8} opcode - 8 bit opcode value
+   * @param {UInt16} opcode - 16 bit operand word
    */
   function jmpToAddrPlsV0(opcode, self) {
     var v0 = self.registers[0];
@@ -209,7 +209,7 @@ define(['./reg0', './reg8', './rege', './regf', './errors/notrecognised'], funct
    * psuedo: 	Vx=rand()&NN
    * operator type: Rand
    * opcode: CXNN
-   * @param {UInt8} opcode - 8 bit opcode value
+   * @param {UInt16} opcode - 16 bit operand word
    */
   function bitSetVxRandAndV0(opcode, self) {
     var vx = (opcode & 0x0F00) >> 8;
@@ -228,7 +228,7 @@ define(['./reg0', './reg8', './rege', './regf', './errors/notrecognised'], funct
    * psuedo: 	draw(Vx,Vy,N)
    * operator type: Display
    * opcode: DXYN
-   * @param {UInt8} opcode - 8 bit opcode value
+   * @param {UInt16} opcode - 16 bit operand word
    */
   function draw(opcode, self) {
     var vx = (opcode & 0x0F00) >> 8;

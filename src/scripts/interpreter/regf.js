@@ -22,7 +22,7 @@ define(function() {
    * pseudo: Vx = get_delay()
    * operator type: Timer
    * opcode: FX07
-   * @param {UInt8} opcode - 8 bit opcode value
+   * @param {UInt16} opcode - 16 bit operand word
    */
   function setVxToDelay(opcode, self) {
     var vx = (opcode & 0x0F00) >> 8;
@@ -37,7 +37,7 @@ define(function() {
    * pseudo: Vx = get_key()
    * operator type: Keyboard
    * opcode: FX0A
-   * @param {UInt8} opcode - 8 bit opcode value
+   * @param {UInt16} opcode - 16 bit operand word
    */
   function setVxToKey(opcode, self) {
     var pressed = false;
@@ -64,7 +64,7 @@ define(function() {
    * pseudo: 	delay_timer(Vx)
    * operator type: Timer
    * opcode: FX15
-   * @param {UInt8} opcode - 8 bit opcode value
+   * @param {UInt16} opcode - 16 bit operand word
    */
   function setDelayTimer(opcode, self) {
     var vx = (opcode & 0x0F00) >> 8;
@@ -78,7 +78,7 @@ define(function() {
    * pseudo: 	sound_timer(Vx)
    * operator type: Timer
    * opcode: FX18
-   * @param {UInt8} opcode - 8 bit opcode value
+   * @param {UInt16} opcode - 16 bit operand word
    */
   function setSoundTimer(opcode, self) {
     var vx = (opcode & 0x0F00) >> 8;
@@ -92,7 +92,7 @@ define(function() {
    * pseudo: 	i += vx
    * operator type: Memory
    * opcode: FX1E
-   * @param {UInt8} opcode - 8 bit opcode value
+   * @param {UInt16} opcode - 16 bit operand word
    */
   function addVxToIdxReg(opcode, self) {
     var vx = (opcode & 0x0F00) >> 8;
@@ -107,7 +107,7 @@ define(function() {
    * pseudo: I=sprite_addr[Vx]
    * operator type: Memory
    * opcode: FX29
-   * @param {UInt8} opcode - 8 bit opcode value
+   * @param {UInt16} opcode - 16 bit operand word
    */
   function setIdxToSprite(opcode, self) {
     var vx = (opcode & 0x0F00) >> 8;
@@ -129,7 +129,7 @@ define(function() {
    *         (I+2)=BCD(1);
    * operator type: Memory
    * opcode: FX33
-   * @param {UInt8} opcode - 8 bit opcode value
+   * @param {UInt16} opcode - 16 bit operand word
    */
   function setBcd(opcode, self) {
     var vx = self.registers[(opcode & 0x0F00)];
@@ -147,7 +147,7 @@ define(function() {
    * pseudo: reg_dump(Vx,&I)
    * operator type: Memory
    * opcode: FX55
-   * @param {UInt8} opcode - 8 bit opcode value
+   * @param {UInt16} opcode - 16 bit operand word
    */
   function regDump(opcode, self) {
     var vx = (opcode & 0x0F00) >> 8;
@@ -163,7 +163,7 @@ define(function() {
    * pseudo: reg_load(Vx,&I)
    * operator type: Memory
    * opcode: FX65
-   * @param {UInt8} opcode - 8 bit opcode value
+   * @param {UInt16} opcode - 16 bit operand word
    */
   function regLoad(opcode, self) {
     var vx = (opcode & 0x0F00) >> 8;

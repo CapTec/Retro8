@@ -22,7 +22,7 @@ define(function() {
    * psuedo: Vx = Vy
    * operator type: assignment
    * opcode: 0x8XY0
-   * @param {UInt8} opcode - 8 bit opcode value
+   * @param {UInt16} opcode - 16 bit operand word
    */
   function setVxToVy(opcode, self) {
     var vx = (opcode & 0x0F00) >> 8,
@@ -37,7 +37,7 @@ define(function() {
    * psuedo: Vx = Vx | Vy
    * operator type: bitwise operator
    * opcode: 8XY1
-   * @param {UInt8} opcode - 8 bit opcode value
+   * @param {UInt16} opcode - 16 bit operand word
    */
   function setVxToVxOrVy(opcode, self) {
     var vx = (opcode & 0x0F00) >> 8,
@@ -52,7 +52,7 @@ define(function() {
    * psuedo: Vx = Vx & Vy
    * operator type: bitwise operator
    * opcode: 8XY2
-   * @param {UInt8} opcode - 8 bit opcode value
+   * @param {UInt16} opcode - 16 bit operand word
    */
   function setVxToVxAndVy(opcode, self) {
     var vx = (opcode & 0x0F00) >> 8,
@@ -67,7 +67,7 @@ define(function() {
    * psuedo: Vx = Vx ^ Vy
    * operator type: bitwise operator
    * opcode: 8XY3
-   * @param {UInt8} opcode - 8 bit opcode value
+   * @param {UInt16} opcode - 16 bit operand word
    */
   function setVxToVxXorVy(opcode, self) {
     var vx = (opcode & 0x0F00) >> 8,
@@ -82,7 +82,7 @@ define(function() {
    * psuedo: Vx = Vx += Vy
    * operator type: Math
    * opcode: 8XY4
-   * @param {UInt8} opcode - 8 bit opcode value
+   * @param {UInt16} opcode - 16 bit operand word
    */
   function setVxToVxPlusVy(opcode, self) {
     var vx = (opcode & 0x0F00) >> 8,
@@ -103,7 +103,7 @@ define(function() {
    * psuedo: Vx = Vx -= Vy
    * operator type: Math
    * opcode: 8XY5
-   * @param {UInt8} opcode - 8 bit opcode value
+   * @param {UInt16} opcode - 16 bit operand word
    */
   function setVxToVxMinusVy(opcode, self) {
     var vx = (opcode & 0x0F00) >> 8,
@@ -124,7 +124,7 @@ define(function() {
    * psuedo: Vx >> 1
    * operator type: Bitwise operator
    * opcode: 8XY6
-   * @param {UInt8} opcode - 8 bit opcode value
+   * @param {UInt16} opcode - 16 bit operand word
    */
   function shiftVxRight(opcode, self) {
     var vx = (opcode & 0x0F00) >> 8;
@@ -140,7 +140,7 @@ define(function() {
    * psuedo: Vx = Vy-Vx
    * operator type: Math
    * opcode: 8XY7
-   * @param {UInt8} opcode - 8 bit opcode value
+   * @param {UInt16} opcode - 16 bit operand word
    */
   function setVxEqVyMinusVx(opcode, self) {
     var vx = (opcode & 0x0F00) >> 8,
@@ -161,7 +161,7 @@ define(function() {
    * psuedo: Vx << 1
    * operator type: Math
    * opcode: 8XYE
-   * @param {UInt8} opcode - 8 bit opcode value
+   * @param {UInt16} opcode - 16 bit operand word
    */
   function shiftVxLeft(opcode, self) {
     var vx = (opcode & 0x0F00) >> 8;

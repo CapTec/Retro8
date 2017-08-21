@@ -15,7 +15,7 @@ define(function() {
    * (Usually the next instruction is a jump to skip a code block)
    * psuedo: if(key() == Vx)
    * operator type: Keyboard
-   * @param {UInt8} opcode - 8 bit opcode value
+   * @param {UInt16} opcode - 16 bit operand word
    */
   function skipIfVxPressed(opcode, self) {
     var vx = (opcode & 0x0F00) >> 8;
@@ -33,7 +33,7 @@ define(function() {
    * (Usually the next instruction is a jump to skip a code block)
    * psuedo: if(key() != Vx)
    * operator type: Keyboard
-   * @param {UInt8} opcode - 8 bit opcode value
+   * @param {UInt16} opcode - 16 bit operand word
    */
   function skipIfVxNotPressed(opcode, self) {
     var vx = (opcode & 0x0F00) >> 8;

@@ -20,7 +20,7 @@ define(['./errors/notimplemented'], function(CodeNotImplemented) {
    * pseudo: n/a
    * operator type: Call
    * opcode: 0x0NNN
-   * @param {UInt8} opcode - 8 bit opcode value
+   * @param {UInt16} opcode - 16 bit operand word
    */
   function callRca(opcode, self) {
     throw new CodeNotImplemented(opcode);
@@ -31,7 +31,7 @@ define(['./errors/notimplemented'], function(CodeNotImplemented) {
    * pseudo: disp_clear()
    * operator type: Display/Graphics
    * opcode: 0x00E0
-   * @param {UInt8} opcode - 8 bit opcode value
+   * @param {UInt16} opcode - 16 bit operand word
    */
   function clearDisplay(opcode, self) {
     var width = self.display.length;
@@ -49,7 +49,7 @@ define(['./errors/notimplemented'], function(CodeNotImplemented) {
    * pseudo: return;
    * operator type: Flow
    * opcode: 0x00EE
-   * @param {UInt8} opcode - 8 bit opcode value
+   * @param {UInt16} opcode - 16 bit operand word
    */
   function returnFrom(opcode, self) {
     // The interpreter sets the program counter to the address at the top of the stack, then subtracts 1 from the stack pointer.
