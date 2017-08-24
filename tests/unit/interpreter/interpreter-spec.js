@@ -1,7 +1,9 @@
 define(function(require) {
   var Interpreter = require('src/scripts/interpreter/interpreter'),
     keyboard = require('src/scripts/interpreter/keyboard'),
-    font = require('src/scripts/interpreter/font');
+    font = require('src/scripts/interpreter/font'),
+    AsyncBinLoader = require('src/scripts/helpers/asyncbinloader'),
+    NotEnoughMemory = require('src/scripts/interpreter/errors/notenoughmemory');
 
   describe('new Interpreter', function() {
     var actual = new Interpreter();
@@ -175,7 +177,10 @@ define(function(require) {
     });
   });
   describe('handleTimers', function() {
-    var actual = new Interpreter();
+    var actual = null;
+    beforeEach(function() {
+      actual = new Interpreter();
+    });
 
     it('should decrement timers by 1 if > 0', function() {
       actual.delayTimer = 1;
@@ -200,5 +205,44 @@ define(function(require) {
       expect(actual.delayTimer).toBe(expected_dt);
       expect(actual.soundTimer).toBe(expected_st);
     });
+
+
   });
+
+  describe('loadProgram', function() {
+    var actual = null;
+
+    beforeEach(function() {
+      actual = new Interpreter();
+    });
+
+    it('should load program into memory', function() {
+      var usable_memory = 3584;
+      var expected_memory = new Uint8Array(usable_memory);
+
+      for(var i = 0; i < usable_memory; i++) {
+        expected_memory[i] = Math.floor(Math.random() * 256);
+      }
+
+      actual.loadProgram(expected_memory);
+      var tmp = Array.prototype.slice.call(actual.memory, 0x200, 0x200 + usable_memory);
+      var actual_memory_segment = new Uint8Array(tmp.length);
+      for(var i = 0; i < tmp.length; i++) {
+        actual_memory_segment[i] = tmp[i];
+      }
+
+      expect(actual_memory_segment).toEqual(expected_memory);
+    });
+
+    it('should throw error if program is too large for memory', function() {
+      var usable_memory = 3584;
+      var binary = new Uint8Array(usable_memory + 1);
+
+      function load() {
+        actual.loadProgram(binary);
+      }
+
+      expect(load).toThrowError(NotEnoughMemory);
+    });
+  })
 });

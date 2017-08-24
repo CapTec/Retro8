@@ -17,11 +17,11 @@ module.exports = function(config) {
     files: [
       'tests/test-main.js',
       {
-        pattern: 'src/scripts/interpreter/**/*.js',
+        pattern: 'src/binaries/*.ch8',
         included: false
       },
       {
-        pattern: 'src/scripts/interpreter/*.js',
+        pattern: 'src/scripts/**/*.js',
         included: false
       },
       {
@@ -38,8 +38,7 @@ module.exports = function(config) {
     // preprocess matching files before serving them to the browser
     // available preprocessors: https://npmjs.org/browse/keyword/karma-preprocessor
     preprocessors: {
-      'src/scripts/interpreter/**/*.js': ['coverage'],
-      'src/scripts/interpreter/*.js': ['coverage']
+      'src/**/*.js': ['coverage']
     },
 
 

@@ -4,15 +4,13 @@ define(function(require) {
   var operations = require('./operations'),
     font = require('./font'),
     keyboard = require('./keyboard'),
+    NotEnoughMemory = require('./errors/notenoughmemory'),
     memoryLimit = 4096,
     registerCount = 16,
     width = 64,
     height = 32,
-    stackSize = 16,
-    reset,
-    cycle,
-    loadFont,
-    handleTimers;
+    stackSize = 16;
+
 
   function Interpreter() {
     this.program_counter = 0x200;
@@ -37,10 +35,11 @@ define(function(require) {
     initMemory: initMemory,
     initRegisters: initRegisters,
     initKeyboard: initKeyboard,
-    initStack: initStack
+    initStack: initStack,
+    loadProgram: loadProgram
   };
 
-  reset = function reset() {
+  function reset() {
     this.program_counter = 0x200;
     this.stack = initStack();
     this.stack_pointer = 0;
@@ -78,7 +77,7 @@ define(function(require) {
     return display;
   }
 
-  cycle = function cycle() {
+  function cycle() {
     var opcode = this.memory[this.program_counter];
     var op;
     opcode <<= 8;
@@ -101,7 +100,7 @@ define(function(require) {
   /*
    * Decrements Chip8 timers if > 0
    */
-  handleTimers = function handleTimers() {
+  function handleTimers() {
     if (this.delayTimer > 0)
       this.delayTimer -= 1;
 
@@ -115,12 +114,26 @@ define(function(require) {
    * Fonts are loaded into the reserved interpreter memory
    * space (0x000 to 0x1FF)
    */
-  loadFont = function loadFont() {
+  function loadFont() {
     var length = font.length;
     for (var i = 0; i < length; i++) {
       this.memory[i] = font[i];
     }
-  };
+  }
+
+  /*
+   * Loads a binary file into memory starting at 0x200
+   */
+  function loadProgram(binary) {
+    var writableMemory = memoryLimit - 0x200;
+    
+    if(binary.length > writableMemory)
+      throw new NotEnoughMemory(binary.length, writableMemory);
+
+    for(var i = 0; i < binary.length; i++) {
+      this.memory[i + 0x200] = binary[i];
+    }
+  }
 
   function initKeyboard() {
     return keyboard.keys();

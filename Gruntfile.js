@@ -16,7 +16,6 @@ module.exports = function(grunt) {
     watch: {
       karma: {
         files: [
-          'src/scripts/**/**/*.js',
           'src/scripts/**/*.js',
           'tests/unit/**/*.js'
         ]
