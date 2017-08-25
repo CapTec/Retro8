@@ -24,8 +24,6 @@ define(function() {
     if (self.keyboard[key] === 0x1) {
       self.program_counter += 2;
     }
-
-    self.program_counter += 2;
   }
 
   /*
@@ -42,8 +40,6 @@ define(function() {
     if (self.keyboard[key] === 0x0) {
       self.program_counter += 2;
     }
-
-    self.program_counter += 2;
   }
 
   return {

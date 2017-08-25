@@ -67,8 +67,9 @@ define(['./reg0', './reg8', './rege', './regf', './errors/notrecognised'], funct
   function gosub(opcode, self) {
     var nnn = opcode & 0x0FFF;
 
-    self.stack_pointer += 1;
-    self.stack.push(self.program_counter);
+    self.stack_pointer++;
+    self.stack[self.stack_pointer] = self.program_counter;
+
     self.program_counter = nnn;
   }
 
@@ -87,7 +88,6 @@ define(['./reg0', './reg8', './rege', './regf', './errors/notrecognised'], funct
     if (self.registers[vx] === nn) {
       self.program_counter += 2;
     }
-    self.program_counter += 2;
   }
 
   /*
@@ -105,7 +105,6 @@ define(['./reg0', './reg8', './rege', './regf', './errors/notrecognised'], funct
     if (self.registers[vx] !== nn) {
       self.program_counter += 2;
     }
-    self.program_counter += 2;
   }
 
   /*
@@ -123,7 +122,6 @@ define(['./reg0', './reg8', './rege', './regf', './errors/notrecognised'], funct
     if (self.registers[vx] === self.registers[vy]) {
       self.program_counter += 2;
     }
-    self.program_counter += 2;
   }
 
   /*
@@ -138,7 +136,6 @@ define(['./reg0', './reg8', './rege', './regf', './errors/notrecognised'], funct
       nn = opcode & 0x00FF;
 
     self.registers[vx] = nn;
-    self.program_counter += 2;
   }
 
   /*
@@ -153,12 +150,10 @@ define(['./reg0', './reg8', './rege', './regf', './errors/notrecognised'], funct
       nn = opcode & 0x00FF;
 
     self.registers[vx] += nn;
-    self.program_counter += 2;
   }
 
   /*
-   * Skips the next instruction if VX doesn't equal VY.
-   * (Usually the next instruction is a jump to skip a code block).
+   * The values of Vx and Vy are compared, and if they are not equal, the program counter is increased by 2.
    * psuedo: if(Vx!=Vy)
    * operator type: conditional
    * opcode: 9XY0
@@ -167,8 +162,6 @@ define(['./reg0', './reg8', './rege', './regf', './errors/notrecognised'], funct
   function skipIfVxNotVy(opcode, self) {
     var vx = (opcode & 0x0F00) >> 8,
       vy = (opcode & 0x00F0) >> 4;
-
-    self.program_counter += 2;
 
     if (self.registers[vx] !== self.registers[vy]) {
       self.program_counter += 2;
@@ -183,14 +176,13 @@ define(['./reg0', './reg8', './rege', './regf', './errors/notrecognised'], funct
    * @param {UInt16} opcode - 16 bit operand word
    */
   function setIndexToAddr(opcode, self) {
-    var nnn = opcode & 0x0FFF;
+    var nnn = opcode & 0xFFF;
 
     self.index_register = nnn;
-    self.program_counter += 2;
   }
 
   /*
-   * Jumps to the address NNN plus V0.
+   * The program counter is set to nnn plus the value of V0.
    * psuedo: PC=V0+NNN
    * operator type: Flow
    * opcode: BNNN
@@ -198,7 +190,7 @@ define(['./reg0', './reg8', './rege', './regf', './errors/notrecognised'], funct
    */
   function jmpToAddrPlsV0(opcode, self) {
     var v0 = self.registers[0];
-    var nnn = (opcode & 0x0FFF);
+    var nnn = opcode & 0x0FFF;
 
     self.program_counter = nnn + v0;
   }
@@ -216,7 +208,6 @@ define(['./reg0', './reg8', './rege', './regf', './errors/notrecognised'], funct
     var nn = (opcode & 0x00FF);
 
     self.registers[vx] = Math.floor(Math.random() * 256) & nn;
-    self.program_counter += 2;
   }
 
   /*
@@ -256,7 +247,7 @@ define(['./reg0', './reg8', './rege', './regf', './errors/notrecognised'], funct
       }
     }
 
-    self.program_counter += 2;
+    self.render = true;
   }
 
   return {

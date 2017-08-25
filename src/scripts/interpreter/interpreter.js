@@ -27,6 +27,7 @@ define(function(require) {
     this.loadFont = loadFont;
     this.cycle = cycle;
     this.handleTimers = handleTimers;
+    this.render = false;
     loadFont.call(this);
   }
 
@@ -51,6 +52,7 @@ define(function(require) {
     this.loadFont();
     this.delayTimer = 0;
     this.soundTimer = 0;
+    this.render = false;
   };
 
   function initStack() {
@@ -78,24 +80,12 @@ define(function(require) {
   }
 
   function cycle() {
-    var opcode = this.memory[this.program_counter];
-    var op;
-    opcode <<= 8;
-    opcode |= this.memory[this.program_counter + 1];
+    var opcode = this.memory[this.program_counter] << 8 | this.memory[this.program_counter + 1];
+    this.program_counter += 2;
 
-    try {
-      op = operations.getOps(opcode, this); // decode
-    } catch (err) {
-      // error occurred decoding the current opcode.
-    }
-    try {
-      op.call(undefined, opcode, this); // execute
-    } catch (err) {
-      // opcode execution logic error occurred. Handle appropriately
-    }
-
-    handleTimers.call(this);
-  };
+    var op = operations.getOps(opcode, this); // decode
+    op.call(undefined, opcode, this); // execute
+  }
 
   /*
    * Decrements Chip8 timers if > 0
@@ -126,7 +116,7 @@ define(function(require) {
    */
   function loadProgram(binary) {
     var writableMemory = memoryLimit - 0x200;
-    
+
     if(binary.length > writableMemory)
       throw new NotEnoughMemory(binary.length, writableMemory);
 

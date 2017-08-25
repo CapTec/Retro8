@@ -27,8 +27,6 @@ define(function() {
   function setVxToDelay(opcode, self) {
     var vx = (opcode & 0x0F00) >> 8;
     self.registers[vx] = self.delayTimer;
-
-    self.program_counter += 2;
   }
 
   /*
@@ -51,12 +49,13 @@ define(function() {
       break;
     }
 
-    if (pressed !== true)
+    if (pressed !== true) {
+      self.program_counter = self.program_counter === 0 ? 0 : self.program_counter - 2;
       return;
+    }
 
     var vx = (opcode & 0x0F00) >> 8;
     self.registers[vx] = key;
-    self.program_counter += 2;
   }
 
   /*
@@ -69,8 +68,6 @@ define(function() {
   function setDelayTimer(opcode, self) {
     var vx = (opcode & 0x0F00) >> 8;
     self.delayTimer = self.registers[vx];
-
-    self.program_counter += 2;
   }
 
   /*
@@ -83,8 +80,6 @@ define(function() {
   function setSoundTimer(opcode, self) {
     var vx = (opcode & 0x0F00) >> 8;
     self.soundTimer = self.registers[vx];
-
-    self.program_counter += 2;
   }
 
   /*
@@ -97,8 +92,6 @@ define(function() {
   function addVxToIdxReg(opcode, self) {
     var vx = (opcode & 0x0F00) >> 8;
     self.index_register += self.registers[vx];
-
-    self.program_counter += 2;
   }
 
   /*
@@ -112,8 +105,6 @@ define(function() {
   function setIdxToSprite(opcode, self) {
     var vx = (opcode & 0x0F00) >> 8;
     self.index_register = self.registers[vx] * 5;
-
-    self.program_counter += 2;
   }
 
   /*
@@ -138,8 +129,6 @@ define(function() {
       self.memory[self.index_register + i - 1] = parseInt(vx % 10); // we modulo by 10 to get the BCD
       vx = Math.floor(vx / 10); // reduces the decimal number to its next lowest unit
     }
-
-    self.program_counter += 2;
   }
 
   /*
@@ -154,8 +143,6 @@ define(function() {
     for (var i = 0; i <= vx; i++) {
       self.memory[self.index_register + i] = self.registers[i];
     }
-
-    self.program_counter += 2;
   }
 
   /*
@@ -170,8 +157,6 @@ define(function() {
     for (var i = 0; i <= vx; i++) {
       self.registers[i] = self.memory[self.index_register + i];
     }
-
-    self.program_counter += 2;
   }
 
   return {

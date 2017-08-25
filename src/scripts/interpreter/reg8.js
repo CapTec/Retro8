@@ -29,7 +29,6 @@ define(function() {
       vy = (opcode & 0x00F0) >> 4;
 
     self.registers[vx] = self.registers[vy];
-    self.program_counter += 2;
   }
 
   /*
@@ -43,8 +42,7 @@ define(function() {
     var vx = (opcode & 0x0F00) >> 8,
       vy = (opcode & 0x00F0) >> 4;
 
-    self.registers[vx] = self.registers[vx] | self.registers[vy];
-    self.program_counter += 2;
+    self.registers[vx] |= self.registers[vy];
   }
 
   /*
@@ -58,8 +56,7 @@ define(function() {
     var vx = (opcode & 0x0F00) >> 8,
       vy = (opcode & 0x00F0) >> 4;
 
-    self.registers[vx] = self.registers[vx] & self.registers[vy];
-    self.program_counter += 2;
+    self.registers[vx] &= self.registers[vy];
   }
 
   /*
@@ -73,12 +70,13 @@ define(function() {
     var vx = (opcode & 0x0F00) >> 8,
       vy = (opcode & 0x00F0) >> 4;
 
-    self.registers[vx] = self.registers[vx] ^ self.registers[vy];
-    self.program_counter += 2;
+    self.registers[vx] ^= self.registers[vy];
   }
 
   /*
-   * Adds VY to VX. VF is set to 1 when there's a carry, and to 0 when there isn't.
+   * The values of Vx and Vy are added together.
+   * If the result is greater than 8 bits (i.e., > 255,)
+   * VF is set to 1, otherwise 0. Only the lowest 8 bits of the result are kept, and stored in Vx.
    * psuedo: Vx = Vx += Vy
    * operator type: Math
    * opcode: 8XY4
@@ -88,18 +86,17 @@ define(function() {
     var vx = (opcode & 0x0F00) >> 8,
       vy = (opcode & 0x00F0) >> 4;
 
-    self.registers[vx] += self.registers[vy];
-    if (self.registers[vy] > 0xFF - self.registers[vx]) {
+    if(self.registers[vx] + self.registers[vy] > 0xFF) {
       self.registers[0xF] = 1;
     } else {
       self.registers[0xF] = 0;
     }
 
-    self.program_counter += 2;
+    self.registers[vx] += self.registers[vy];
   }
 
   /*
-   * VY is subtracted from VX. VF is set to 0 when there's a borrow, and 1 when there isn't.
+   * If Vx > Vy, then VF is set to 1, otherwise 0. Then Vy is subtracted from Vx, and the results stored in Vx.
    * psuedo: Vx = Vx -= Vy
    * operator type: Math
    * opcode: 8XY5
@@ -109,18 +106,17 @@ define(function() {
     var vx = (opcode & 0x0F00) >> 8,
       vy = (opcode & 0x00F0) >> 4;
 
-    if (self.registers[vx] > self.registers[vy]) {
-      self.registers[0xF] = 1;
-    } else {
-      self.registers[0xF] = 0;
-    }
+      if(self.registers[vx] > self.registers[vy]) {
+        self.registers[0xF] = 1;
+      } else {
+        self.registers[0xF] = 0;
+      }
 
-    self.registers[vx] -= self.registers[vy];
-    self.program_counter += 2;
+      self.registers[vx] -= self.registers[vy];
   }
 
   /*
-   * Shifts VX right by one. VF is set to the value of the least significant bit of VX before the shift.
+   * If the least-significant bit of Vx is 1, then VF is set to 1, otherwise 0. Then Vx is divided by 2.
    * psuedo: Vx >> 1
    * operator type: Bitwise operator
    * opcode: 8XY6
@@ -131,12 +127,11 @@ define(function() {
     var lsb = self.registers[vx] & 0x01;
 
     self.registers[0xF] = lsb;
-    self.registers[vx] = self.registers[vx] >> 1;
-    self.program_counter += 2;
+    self.registers[vx] >>= 1;
   }
 
   /*
-   * Sets VX to VY minus VX. VF is set to 0 when there's a borrow, and 1 when there isn't.
+   * If Vy > Vx, then VF is set to 1, otherwise 0. Then Vx is subtracted from Vy, and the results stored in Vx.
    * psuedo: Vx = Vy-Vx
    * operator type: Math
    * opcode: 8XY7
@@ -153,11 +148,10 @@ define(function() {
     }
 
     self.registers[vx] = self.registers[vy] - self.registers[vx];
-    self.program_counter += 2;
   }
 
   /*
-   * Shifts VX left by one. VF is set to the value of the most significant bit of VX before the shift.
+   * If the most-significant bit of Vx is 1, then VF is set to 1, otherwise to 0. Then Vx is multiplied by 2.
    * psuedo: Vx << 1
    * operator type: Math
    * opcode: 8XYE
@@ -168,8 +162,7 @@ define(function() {
     var msb = self.registers[vx] & 0x80;
 
     self.registers[0xF] = msb;
-    self.registers[vx] = self.registers[vx] << 1;
-    self.program_counter += 2;
+    self.registers[vx] <<= 1;
   }
 
   return {

@@ -3,7 +3,8 @@ define(function(require) {
     keyboard = require('src/scripts/interpreter/keyboard'),
     font = require('src/scripts/interpreter/font'),
     AsyncBinLoader = require('src/scripts/helpers/asyncbinloader'),
-    NotEnoughMemory = require('src/scripts/interpreter/errors/notenoughmemory');
+    NotEnoughMemory = require('src/scripts/interpreter/errors/notenoughmemory'),
+    polyfill = require('src/scripts/helpers/typedarrayslice');
 
   describe('new Interpreter', function() {
     var actual = new Interpreter();
@@ -224,12 +225,13 @@ define(function(require) {
         expected_memory[i] = Math.floor(Math.random() * 256);
       }
 
+      var old = Uint8Array.prototype.slice;
+      polyfill(Uint8Array);
+
       actual.loadProgram(expected_memory);
-      var tmp = Array.prototype.slice.call(actual.memory, 0x200, 0x200 + usable_memory);
-      var actual_memory_segment = new Uint8Array(tmp.length);
-      for(var i = 0; i < tmp.length; i++) {
-        actual_memory_segment[i] = tmp[i];
-      }
+
+      var actual_memory_segment = actual.memory.slice( 0x200, 0x200 + usable_memory);
+      Uint8Array.prototype.slice = old;
 
       expect(actual_memory_segment).toEqual(expected_memory);
     });

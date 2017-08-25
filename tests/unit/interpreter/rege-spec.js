@@ -13,7 +13,7 @@ define(function(require) {
         expect(actual.prototype.constructor.name).toBe(expected);
       });
 
-      it('increments program_counter by 4 if vx is pressed', function() {
+      it('increments program_counter by 2 if vx is pressed', function() {
         var state = {
           registers: Interpreter.prototype.initRegisters(),
           program_counter: 0,
@@ -22,14 +22,14 @@ define(function(require) {
           } // A key pressed
         };
         state.registers[0] = 0XA;
-        var expected_pc = 4;
+        var expected_pc = 2;
 
         actual.call(undefined, opcode, state);
 
         expect(state.program_counter).toBe(expected_pc);
       });
 
-      it('increments program_counter by 2 if vx is not pressed', function() {
+      it('does not increment program_counter if vx is not pressed', function() {
         var state = {
           registers: Interpreter.prototype.initRegisters(),
           program_counter: 0,
@@ -38,7 +38,7 @@ define(function(require) {
           } // A key pressed
         };
         state.registers[0] = 0XA;
-        var expected_pc = 2;
+        var expected_pc = 0;
 
         actual.call(undefined, opcode, state);
 
@@ -56,7 +56,7 @@ define(function(require) {
         expect(actual.prototype.constructor.name).toBe(expected);
       });
 
-      it('increments program_counter by 4 if vx is not pressed', function() {
+      it('increments program_counter by 2 if vx is not pressed', function() {
         var state = {
           registers: Interpreter.prototype.initRegisters(),
           program_counter: 0,
@@ -65,14 +65,14 @@ define(function(require) {
           } // A key not pressed
         };
         state.registers[0] = 0xA;
-        var expected_pc = 4;
+        var expected_pc = 2;
 
         actual.call(undefined, opcode, state);
 
         expect(state.program_counter).toBe(expected_pc);
       });
 
-      it('increments program_counter by 2 if vx is pressed', function() {
+      it('does not increment program_counter if vx is pressed', function() {
         var state = {
           registers: Interpreter.prototype.initRegisters(),
           program_counter: 0,
@@ -81,7 +81,7 @@ define(function(require) {
           } // A key not pressed
         };
         state.registers[0] = 0xA;
-        var expected_pc = 2;
+        var expected_pc = 0;
 
         actual.call(undefined, opcode, state);
 

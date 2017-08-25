@@ -33,19 +33,16 @@ define(function(require) {
         expect(actual.prototype.constructor.name).toBe(expected);
       });
 
-      it('should call clearDisplay and set all pixels to "off" (0) and inc pc + 2', function() {
+      it('should call clearDisplay and set all pixels to "off" (0)', function() {
         var state = {
           display: Interpreter.prototype.initDisplay(64, 32),
-          program_counter: 0
         };
-        var expected_pc = 2;
 
         actual.call(undefined, opcode, state);
         expect(state.display[0][0]).toBe(0); // top left
         expect(state.display[63][0]).toBe(0); // top right
         expect(state.display[0][31]).toBe(0); // bottom left
         expect(state.display[63][31]).toBe(0); // bottom right
-        expect(state.program_counter).toBe(expected_pc);
       });
     });
 
@@ -62,9 +59,11 @@ define(function(require) {
       it('should set program_counter to last stack item and decrement stack pointer', function() {
         var state = {
           program_counter: 0x400,
-          stack: [0x200, 0x300],
+          stack: new Uint16Array(16),
           stack_pointer: 1
         };
+        state.stack[0] = 0x200;
+        state.stack[1] = 0x300;
 
         var expected_pc = 0x300;
         var expected_sp = 0;

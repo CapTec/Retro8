@@ -34,14 +34,14 @@ define(['./errors/notimplemented'], function(CodeNotImplemented) {
    * @param {UInt16} opcode - 16 bit operand word
    */
   function clearDisplay(opcode, self) {
-    var width = self.display.length;
-    for (var i = 0; i < width; i++) {
-      var height = self.display[i].length;
-      for (var j = 0; j < height; j++) {
-        self.display[i][j] = 0;
+    for (var y = 0; y < 32; y++) {
+      for (var x = 0; x < 64; x++) {
+        self.display[x][y] = 0x0;
       }
     }
-    self.program_counter += 2;
+
+    self.render = true;
+
   }
 
   /*
@@ -52,9 +52,8 @@ define(['./errors/notimplemented'], function(CodeNotImplemented) {
    * @param {UInt16} opcode - 16 bit operand word
    */
   function returnFrom(opcode, self) {
-    // The interpreter sets the program counter to the address at the top of the stack, then subtracts 1 from the stack pointer.
-    self.program_counter = self.stack[self.stack.length - 1];
-    self.stack_pointer -= 1;
+    self.program_counter = self.stack[self.stack_pointer];
+    self.stack_pointer--;
   }
 
   return {
