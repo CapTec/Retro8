@@ -52,7 +52,7 @@ requirejs(["interpreter/interpreter", 'helpers/asyncbinloader', 'helpers/keyboar
     window.requestAnimationFrame(cycle);
   }
 
-  loader.load('binaries/file1.ch8', initialize);
+  loader.load('binaries/INVADERS.ch8', initialize);
 
 
   var select = document.querySelector('select');
