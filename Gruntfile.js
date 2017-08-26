@@ -5,7 +5,7 @@ module.exports = function(grunt) {
       unit: {
         configFile: 'karma.conf.js',
         background: true,
-        browsers: ['PhantomJS']
+        browsers: ['Chrome']
       },
       travis: {
         configFile: 'karma.conf.js',

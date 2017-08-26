@@ -9,8 +9,8 @@ define(function(require) {
     registerCount = 16,
     width = 64,
     height = 32,
-    stackSize = 16;
-
+    stackSize = 16,
+    reset, cycle, handleTimers, loadProgram, loadFont;
 
   function Interpreter() {
     this.program_counter = 0x200;
@@ -28,6 +28,7 @@ define(function(require) {
     this.cycle = cycle;
     this.handleTimers = handleTimers;
     this.render = false;
+    this.loadProgram = loadProgram;
     loadFont.call(this);
   }
 
@@ -36,11 +37,10 @@ define(function(require) {
     initMemory: initMemory,
     initRegisters: initRegisters,
     initKeyboard: initKeyboard,
-    initStack: initStack,
-    loadProgram: loadProgram
+    initStack: initStack
   };
 
-  function reset() {
+  reset = function reset() {
     this.program_counter = 0x200;
     this.stack = initStack();
     this.stack_pointer = 0;
@@ -79,18 +79,18 @@ define(function(require) {
     return display;
   }
 
-  function cycle() {
+  cycle = function cycle() {
     var opcode = this.memory[this.program_counter] << 8 | this.memory[this.program_counter + 1];
     this.program_counter += 2;
 
     var op = operations.getOps(opcode, this); // decode
     op.call(undefined, opcode, this); // execute
-  }
+  };
 
   /*
    * Decrements Chip8 timers if > 0
    */
-  function handleTimers() {
+  handleTimers = function handleTimers() {
     if (this.delayTimer > 0)
       this.delayTimer -= 1;
 
@@ -104,26 +104,26 @@ define(function(require) {
    * Fonts are loaded into the reserved interpreter memory
    * space (0x000 to 0x1FF)
    */
-  function loadFont() {
+  loadFont = function loadFont() {
     var length = font.length;
     for (var i = 0; i < length; i++) {
       this.memory[i] = font[i];
     }
-  }
+  };
 
   /*
    * Loads a binary file into memory starting at 0x200
    */
-  function loadProgram(binary) {
+  loadProgram = function loadProgram(binary) {
     var writableMemory = memoryLimit - 0x200;
 
-    if(binary.length > writableMemory)
+    if (binary.length > writableMemory)
       throw new NotEnoughMemory(binary.length, writableMemory);
 
-    for(var i = 0; i < binary.length; i++) {
+    for (var i = 0; i < binary.length; i++) {
       this.memory[i + 0x200] = binary[i];
     }
-  }
+  };
 
   function initKeyboard() {
     return keyboard.keys();

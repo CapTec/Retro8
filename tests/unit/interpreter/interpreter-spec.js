@@ -221,7 +221,7 @@ define(function(require) {
       var usable_memory = 3584;
       var expected_memory = new Uint8Array(usable_memory);
 
-      for(var i = 0; i < usable_memory; i++) {
+      for (var i = 0; i < usable_memory; i++) {
         expected_memory[i] = Math.floor(Math.random() * 256);
       }
 
@@ -230,7 +230,7 @@ define(function(require) {
 
       actual.loadProgram(expected_memory);
 
-      var actual_memory_segment = actual.memory.slice( 0x200, 0x200 + usable_memory);
+      var actual_memory_segment = actual.memory.slice(0x200, 0x200 + usable_memory);
       Uint8Array.prototype.slice = old;
 
       expect(actual_memory_segment).toEqual(expected_memory);
@@ -246,5 +246,5 @@ define(function(require) {
 
       expect(load).toThrowError(NotEnoughMemory);
     });
-  })
+  });
 });

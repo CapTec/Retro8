@@ -1,21 +1,28 @@
-requirejs(["interpreter/interpreter", 'helpers/asyncbinloader'], function(Interpreter, AsyncBinLoader) {
+requirejs(["interpreter/interpreter", 'helpers/asyncbinloader', 'helpers/keyboardhandler'], function(Interpreter, AsyncBinLoader, KeyboardHandler) {
   var processor = new Interpreter();
   var loader = new AsyncBinLoader();
+  var keyHandler = new KeyboardHandler(processor.keyboard);
   var canvas = document.getElementById('display');
   var context = canvas.getContext('2d');
+
+  var width = 64,
+    height = 32,
+    aspect_ratio = 2;
+
+  var frameBufferWidth = canvas.clientWidth;
+  var frameBufferHeight = canvas.clientWidth / aspect_ratio;
   var multiplier = 10;
-  var width = 64, height = 32;
 
   function cycle(timestamp) {
     var cycles = 0;
-    while(!processor.render && cycles < 875) {
+    while (!processor.render && cycles < 100) {
       processor.cycle();
       cycles++;
     }
 
     processor.render = false;
 
-    context.clearRect(0, 0, canvas.width, canvas.height); // clear display
+    context.clearRect(0, 0, frameBufferWidth, frameBufferHeight); // clear display
 
     for (var y = 0; y < height; y++) {
       for (var x = 0; x < width; x++) {
@@ -32,8 +39,11 @@ requirejs(["interpreter/interpreter", 'helpers/asyncbinloader'], function(Interp
     window.requestAnimationFrame(cycle);
   }
 
-  loader.load('binaries/file1.ch8', function(binary) {
-    processor.loadProgram(binary)
+  function initialize(binary) {
+    processor.loadProgram(binary);
+    keyHandler.addListeners(document);
     window.requestAnimationFrame(cycle);
-  });
+  }
+
+  loader.load('binaries/file1.ch8', initialize);
 });
