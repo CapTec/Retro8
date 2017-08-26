@@ -29,6 +29,7 @@ define(function(require) {
     this.handleTimers = handleTimers;
     this.render = false;
     this.loadProgram = loadProgram;
+    this.running = false;
     loadFont.call(this);
   }
 
@@ -53,6 +54,7 @@ define(function(require) {
     this.delayTimer = 0;
     this.soundTimer = 0;
     this.render = false;
+    this.running = false;
   };
 
   function initStack() {

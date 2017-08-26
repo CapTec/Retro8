@@ -6,7 +6,7 @@ define(function(require) {
       var loader = new AsyncBinLoader(); // need to mock XMLHttpRequest, this does a real request!
       var expected_type = Uint8Array;
 
-      loader.load('base/src/binaries/file0.ch8', function(actual) {
+      loader.load('base/src/binaries/INVADERS.ch8', function(actual) {
         expect(actual.constructor).toBe(expected_type);
         done();
       });

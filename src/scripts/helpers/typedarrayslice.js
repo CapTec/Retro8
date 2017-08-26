@@ -16,7 +16,7 @@ define(function() {
     var arr = Array.prototype.slice.call(this, begin, end);
     var sliced = new this.constructor(arr.length);
 
-    for(var i = 0; i < this.length; i++) {
+    for (var i = 0; i < this.length; i++) {
       sliced[i] = arr[i];
     }
 
@@ -28,7 +28,7 @@ define(function() {
       return false;
 
     ArrayType.prototype.slice = slice;
-    
+
     return true;
   }
 

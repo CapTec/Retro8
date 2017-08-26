@@ -15,10 +15,16 @@ requirejs(["interpreter/interpreter", 'helpers/asyncbinloader', 'helpers/keyboar
 
   function cycle(timestamp) {
     var cycles = 0;
-    while (!processor.render && cycles < 100) {
+    if (!processor.running)
+      return;
+
+    while (!processor.render && cycles < 875 && processor.running) {
       processor.cycle();
       cycles++;
     }
+
+    if (!processor.running)
+      return;
 
     processor.render = false;
 
@@ -40,10 +46,22 @@ requirejs(["interpreter/interpreter", 'helpers/asyncbinloader', 'helpers/keyboar
   }
 
   function initialize(binary) {
-    processor.loadProgram(binary);
     keyHandler.addListeners(document);
+    processor.loadProgram(binary);
+    processor.running = true;
     window.requestAnimationFrame(cycle);
   }
 
   loader.load('binaries/file1.ch8', initialize);
+
+
+  var select = document.querySelector('select');
+  select.addEventListener('change', function(e) {
+    processor.running = false;
+    processor.reset();
+    keyHandler.removeListeners(document);
+    keyHandler = new KeyboardHandler(processor.keyboard);
+    var option = select.options[select.selectedIndex];
+    loader.load('binaries/' + option.value, initialize);
+  });
 });
