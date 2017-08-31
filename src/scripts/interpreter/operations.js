@@ -236,10 +236,7 @@ define(['./reg0', './reg8', './rege', './regf', './errors/notrecognised'], funct
 
       for (var x = 0; x < 8; x++) {
         if ((sprite_byte & (0x80 >> x)) !== 0) {
-          var tmp = coordx + x;
-          if (tmp > 63) {
-            tmp = tmp % 63;
-          }
+          var tmp = (coordx + x) % 64;
           if (self.display[tmp][coordy + y] === 0x1) {
             self.registers[0xF] = 1;
           }
