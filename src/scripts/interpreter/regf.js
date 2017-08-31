@@ -123,7 +123,7 @@ define(function() {
    * @param {UInt16} opcode - 16 bit operand word
    */
   function setBcd(opcode, self) {
-    var vx = self.registers[(opcode & 0x0F00)];
+    var vx = self.registers[(opcode & 0x0F00) >> 8];
 
     for (var i = 3; i > 0; i--) { // i is set to the decimal number size
       self.memory[self.index_register + i - 1] = parseInt(vx % 10); // we modulo by 10 to get the BCD

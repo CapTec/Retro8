@@ -235,14 +235,16 @@ define(['./reg0', './reg8', './rege', './regf', './errors/notrecognised'], funct
       var sprite_byte = self.memory[self.index_register + y];
 
       for (var x = 0; x < 8; x++) {
-        var bit = sprite_byte & (0x80 >> x);
-
-        if (bit !== 0x0) {
-          if (self.display[coordx + x][coordy + y] === 0x1) {
+        if ((sprite_byte & (0x80 >> x)) !== 0) {
+          var tmp = coordx + x;
+          if (tmp > 63) {
+            tmp = tmp % 63;
+          }
+          if (self.display[tmp][coordy + y] === 0x1) {
             self.registers[0xF] = 1;
           }
 
-          self.display[coordx + x][coordy + y] ^= 0x1;
+          self.display[tmp][coordy + y] ^= 0x1;
         }
       }
     }
