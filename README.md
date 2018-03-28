@@ -2,4 +2,4 @@
 
 A Chip8 Interpreter implementation using ES5, Object Oriented and Test Driven development patterns.
 
-[Demo](https://captec.github.io/Retro8/src/chip8.html)
+[Demo](https://danielharoldlane.github.io/Retro8/src/chip8.html)
